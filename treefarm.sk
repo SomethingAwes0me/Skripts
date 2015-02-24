@@ -1,3 +1,6 @@
+# Plants a sapling once the base block of a birch tree is broken
+# Uses x, y, and z coordinates because WorldGuard integration was being weird
+# Can be easily changed to use WorldGuard instead of coords in the future.
 on break of birch log:
 	if y coordinate of block is between 55 and 85:
 		if x coordinate of block is between 250 and 310:
@@ -5,6 +8,9 @@ on break of birch log:
 				block below is dirt
 				set block to birch sapling
 
+# Prevents tree farm griefing unless the player is an admin (has the permission
+# kdc.admin).
+# Sends an error message if they try to place.
 on place:
 	player doesn't have permission "kdc.admin"
 	block isn't a birch sapling
@@ -14,6 +20,7 @@ on place:
 				cancel the event
 				send "&8[&4!&8]&7 You cannot place blocks in the tree farm." to player
 
+# Prevents the breaking of saplings in the tree farm.
 on break of birch sapling:
 	if y coordinate of block is between 55 and 85:
 		if x coordinate of block is between 250 and 310:
