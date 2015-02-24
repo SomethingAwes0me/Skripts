@@ -1,3 +1,7 @@
+# Toggles the global chat in case of spam attacks, bot attacks, or the like.
+# Using /chat off not only disables the global chat, but also does not send the
+# first join messages to anyone who isn't an admin.
+
 command /chat <text>:
 	usage: /chat [on/off]
 	description: Used to enable/disable the global chat.
@@ -22,12 +26,14 @@ command /chat <text>:
 		else:
 			send "&3Chat &8&l| &7Error! Please use &b/chat [on/off]&7."
 
+# Actual part that makes sure people can't chat when the chat is disabled.
 on chat:
 	if {global.chat} is false:
 		player does not have permission "kdc.admin"
 		cancel the event
 		send "&3Chat&8 &l|&c You cannot chat right now!"
 
+# Part that makes it so that spam join messages aren't shown.
 on first join:
 	if {global.chat} is true:
 		broadcast "&3%player%&7 has joined the &6Killion Detention Center&7 for the first time!"

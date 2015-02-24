@@ -1,9 +1,25 @@
+# VIRTUAL CHEST REPLACEMENT SYSTEM
+# The VirtualPack plugin which I used to make this system didn't have the
+# ability to access chests through signs, so I coded this up.
+
+# Allows players to buy chests by clicking on a sign that starts with
+# &4[Buy Chest]. Since the plugin only allows for large chests this 
+# charges players 2000 per chest.
+
+# Skript also tracks how many chests the user has so that correct
+# messages are printed out when a player buys a chest or tries to
+# access their chest.
 on right click on sign:
+	# BUY CHEST SIGN
 	if first line is "&4[Buy Chest]":
 		if player's balance is greater than or equal to 2000:
+			# {vc.%player%} is what tracks how many chests the user has.
 			if {vc.%player%} is less than or equal to 9:
 				remove 2000 from player's balance
 				send "&6Success! &7You purchased a virtual chest."
+				# Since the only permission to allow players to buy chests also
+				# lets them use chests anywhere, the permission is given for
+				# 2 ticks, and the player is forced to execute the command.
 				execute command "pex user %player% add vpack.use.chest"
 				make player execute command "/v c buy"
 				wait 2 ticks
@@ -11,17 +27,27 @@ on right click on sign:
 				add 1 to {vc.%player%}
 				stop
 			else:
+				# Limit of 10 chests, if they try to buy more given an error.
 				send "&4Error! &7You already own 10 virtual chests."
 				stop
 		else:
+			# if they don't have enough money - error.
 			send "&4Error! &7You do not have enough money to purchase a chest."
 			stop
 
+	# OPEN CHEST SIGN
+	# This is just a preliminary check to see if the player is using a chest sign.
 	if second line is "Right click me":
+		# Loops through 10 times to find which sign the player is right clicking
+		# on.
 		set {_chestnumb} to 0
 		loop 10 times:
 			add 1 to {_chestnumb}
+			# This makes sure the player owns the chest
 			if {_chestnumb} is less than or equal to {vc.%player%}:
+				# Then check to see if that's the correct chest.
+				# If the chestnum and sign don't line up, it goes through again.
+				# Otherwise, gives them the command and opens the chest.
 				if first line is "&4[Chest %{_chestnumb}%&4]":
 					execute command "pex user %player% add vpack.use.chest"
 					make player execute command "v c %{_chestnumb}%"
@@ -32,12 +58,17 @@ on right click on sign:
 				send "&4Error! &7You do not own this virtual chest." to player
 				stop
 
-
+# If the vc.%player% counter some how gets messed up, it can be reset here.
 command /vcupdate <player> <number>:
 	trigger:
 		set {vc.%arg 1%} to arg 2
 		send "%arg 1% now has %{vc.%arg 1%}% chests."
 
+# Since the plugin checks to see what chest to open based on signs, these
+# checks make sure that players don't create their own chest signs.
+
+# If they do try to make one, it sets the first line to Error! and the third line to
+# You can't do that!
 on sign change:
 	if player doesn't have permission "kdc.admin":
 		if first line is "&4[Buy Chest]" or "&4[Chest 1]" or "&4[Chest 2]" or "&4[Chest 3]" or "&4[Chest 4]" or "&4[Chest 5]" or "&4[Chest 6]" or "&4[Chest 7]" or "&4[Chest 8]" or "&4[Chest 9]" or "&4[Chest 10]" or "bc" or "oc":
@@ -47,12 +78,27 @@ on sign change:
 			set fourth line to ""
 			stop
 
+# Way to create chest signs - create a buy chest sign just set the first line to
+# bc
+# and then it will format the rest of the sign.
 	if first line is "bc":
 		set first line to "&4[Buy Chest]"
 		set second line to "Right click me"
 		set third line to "to purchase"
 		set fourth line to "a &bvirtual chest."
 
+# Way to create open chest signs - here's how to format the sign:
+# oc
+# [chest-number]
+# [chest-number-in-words]
+
+# So, to create an open chest sign for the first chest:
+#
+# oc
+# 1
+# first
+
+# and so on. Using that format then creates a pretty open chest sign.
 	if first line is "oc":
 		set first line to "&4[Chest %line 2%&4]"
 		set second line to "Right click me"

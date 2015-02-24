@@ -1,4 +1,6 @@
 # RANKUP COMMAND
+
+# Allows players to rank up just like the old rankup plugin.
 command /rankup:
 	usage: /rankup
 	description: Used to rankup.

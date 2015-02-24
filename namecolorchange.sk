@@ -1,4 +1,9 @@
 # CHANGE THE COLOR OF YOUR NAME
+# Plugin to allow people to change the color of their own name through a system
+# of name change color credits.
+
+# /addcolor gives the specified player a number of name color change credits
+# which can then be used to change the color of their name.
 command /addcolor <player> <integer>:
 	permission: kdc.admin
 	aliases: /acc
@@ -10,6 +15,8 @@ command /addcolor <player> <integer>:
 		set {_value} to {changecredits.%arg 1%} + arg 2
 		send "&8[&a+&8] &7You now have &3%{_value}%&7 color change credits." to arg 1
 
+# /removecolor removes the given number of name color change credits from the given
+# player.
 command /removecolor <player> <integer>:
 	permission: kdc.admin
 	aliases: /rc, /rcc
@@ -19,6 +26,7 @@ command /removecolor <player> <integer>:
 		remove arg 2 from {changecredits.%arg 1%}
 		send "&8[&c-&8] &7Removed &3%arg 2%&7 color change credits from &6%arg 1%&7's account."
 
+# Allows the player to check how many name color change credits they have.
 command /checkcolor:
 	aliases: /colorcredits, /colorcreds
 	usage: /checkcolor
@@ -27,6 +35,12 @@ command /checkcolor:
 		send "&7You have &3%{changecredits.%player%}% &7color change credits."
 		send "&7Use &6/changecolor&7 to change your name color."
 
+# Actual command which initiates the color changing process.
+# Takes 1 of their name color change credits, and then presents a
+# list of all the possible colors they can change to.
+
+# After the colors are presented it prompts the user to type the name of
+# the color the ywant into chat.
 command /changecolor:
 	usage: /changecolor
 	description: Change the color of your name.
@@ -44,6 +58,10 @@ command /changecolor:
 		else:
 			send "&4Error! &7You do not have any color change credits." to player
 
+# Checks if a player has initiated the name color change process, and then
+# listens for which color they say.
+
+# Name colors are changed using Essentials nicknames.
 on chat:
 	if {colorchange.%player%} is true:
 		if message contains "black":
