@@ -1,0 +1,118 @@
+# CHANGE THE COLOR OF YOUR NAME
+command /addcolor <player> <integer>:
+	permission: kdc.admin
+	aliases: /acc
+	usage: /addcolor [username] [credits-to-add]
+	description: Add color credits to a player's account.
+	trigger:
+		add arg 2 to {changecredits.%arg 1%}
+		send "&8[&a+&8] &7Added &3%arg 2%&7 color change credits to &6%arg 1%&7's account."
+		set {_value} to {changecredits.%arg 1%} + arg 2
+		send "&8[&a+&8] &7You now have &3%{_value}%&7 color change credits." to arg 1
+
+command /removecolor <player> <integer>:
+	permission: kdc.admin
+	aliases: /rc, /rcc
+	usage: /removecolor [username] [credits-to-remove]
+	description: Remove color credits from a player's account.
+	trigger:
+		remove arg 2 from {changecredits.%arg 1%}
+		send "&8[&c-&8] &7Removed &3%arg 2%&7 color change credits from &6%arg 1%&7's account."
+
+command /checkcolor:
+	aliases: /colorcredits, /colorcreds
+	usage: /checkcolor
+	description: Check how many color credits you have.
+	trigger:
+		send "&7You have &3%{changecredits.%player%}% &7color change credits."
+		send "&7Use &6/changecolor&7 to change your name color."
+
+command /changecolor:
+	usage: /changecolor
+	description: Change the color of your name.
+	trigger:
+		if {changecredits.%player%} is greater than or equal to 1:
+			remove 1 from {changecredits.%player%}
+			set {colorchange.%player%} to true
+			send "&7Here are all the colors that your name can be:"
+			send "" to player
+			send "&0Black &l|  &1DarkBlue &l|  &2DarkGreen &l|  &3Teal &l|" to player
+			send "&5Purple &l|  &6Gold &l|  &7LightGray &l|  &8DarkGray &l|  &9Blue &l|" to player
+			send "&aLightGreen &l|  &bAqua &l|  &dPink &l|  &eYellow &l|  &fWhite &l|" to player
+			wait 2 irl seconds
+			send "&7Please type the name (&othat you see above&7) of the color you want your name to be."
+		else:
+			send "&4Error! &7You do not have any color change credits." to player
+
+on chat:
+	if {colorchange.%player%} is true:
+		if message contains "black":
+			cancel the event
+			set {colorchange.%player%} to false
+			execute command "/nick %player% &0%player%"
+			stop
+		if message contains "darkblue":
+			cancel the event
+			set {colorchange.%player%} to false
+			execute command "/nick %player% &1%player%"
+			stop
+		if message contains "darkgreen":
+			cancel the event
+			set {colorchange.%player%} to false
+			execute command "/nick %player% &2%player%"
+			stop
+		if message contains "teal":
+			cancel the event
+			set {colorchange.%player%} to false
+			execute command "/nick %player% &3%player%"
+			stop
+		if message contains "purple":
+			cancel the event
+			set {colorchange.%player%} to false
+			execute command "/nick %player% &5%player%"
+			stop
+		if message contains "gold":
+			cancel the event
+			set {colorchange.%player%} to false
+			execute command "/nick %player% &6%player%"
+			stop
+		if message contains "lightgray":
+			cancel the event
+			set {colorchange.%player%} to false
+			execute command "/nick %player% &7%player%"
+			stop
+		if message contains "darkgray":
+			cancel the event
+			set {colorchange.%player%} to false
+			execute command "/nick %player% &8%player%"
+			stop
+		if message contains "blue":
+			cancel the event
+			set {colorchange.%player%} to false
+			execute command "/nick %player% &9%player%"
+			stop
+		if message contains "lightgreen":
+			cancel the event
+			set {colorchange.%player%} to false
+			execute command "/nick %player% &a%player%"
+			stop
+		if message contains "aqua":
+			cancel the event
+			set {colorchange.%player%} to false
+			execute command "/nick %player% &b%player%"
+			stop
+		if message contains "pink":
+			cancel the event
+			set {colorchange.%player%} to false
+			execute command "/nick %player% &d%player%"
+			stop
+		if message contains "yellow":
+			cancel the event
+			set {colorchange.%player%} to false
+			execute command "/nick %player% &e%player%"
+			stop
+		if message contains "white":
+			cancel the event
+			set {colorchange.%player%} to false
+			execute command "/nick %player% &f%player%"
+			stop

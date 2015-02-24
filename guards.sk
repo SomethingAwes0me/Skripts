@@ -1,0 +1,88 @@
+# GUARD CONTRABAND CALLING SYSTEM
+command /c <player> <text>:
+	permission: kdc.guard
+	aliases: /contraband, /contrabandcall
+	usage: /c [username] [b(ow) / l(ava) / f(lint) / p(otion) / s(word)]
+	description: Call for a user's contraband.
+	trigger:
+		set {_timetodrop} to 5
+		set {contraband.%arg 1%} to true
+		set {droppedyet.%arg 1%} to false
+		if arg 2 is "b" or "bow":
+			set {_weapon} to "bow"
+		else if arg 2 is "l" or "lava":
+			set {_weapon} to "lava bucket"
+		else if arg 2 is "f" or "flint":
+			set {_weapon} to "flint and steel"
+		else if arg 2 is "p" or "potion":
+			set {_weapon} to "damage potion"
+		else if arg 2 is "s" or "sword":
+			set {_weapon} to "sword"
+		
+		send "&8[&9Contraband&8]&6 %command sender% is requesting your %{_weapon}%! &cPlease drop it, or risk being sent to solitary." to arg 1
+		wait 2 seconds
+		send "&8[&9C&8]&6 Requesting %{_weapon}%, please wait..." to executor
+
+		loop 5 times:
+			if {droppedyet.%arg 1%} is false:
+				if {_timetodrop} is greater than 1:
+					send "&8[&9C&8]&b You have %{_timetodrop}% seconds to surrender your %{_weapon}%." to arg 1
+				else:
+					send "&8[&9C&8]&b You have %{_timetodrop}% second to surrender your %{_weapon}%." to arg 1
+				wait 1 second
+				remove 1 from {_timetodrop}
+			if {droppedyet.%arg 1%} is true:
+				set {contraband.%arg 1%} to false
+				send "&8[&9C&8] &6%arg 1% &7has dropped their contraband." 
+				stop
+		if {_timetodrop} is 0:
+			if {droppedyet.%arg 1%} is false:
+				send "&8[&9Contraband&8] &6%arg 1% &7failed to surrender their %{_weapon}% in time!"
+				set {contraband.%arg 1%} to false
+
+aliases:
+	dropweapons = bow, arrow, flint and steel, stone sword, iron sword, gold sword, diamond sword, lava bucket, 373:8232, 373:8264, 373:16424, 373:16456, 373:8268, 373:8236, 373:16460, 373:16428
+
+on drop of dropweapons:
+	if {contraband.%player%} is true:
+		send "&8[&9Contraband&8]&c Thank you for surrendering your contraband." to player
+		set {droppedyet.%player%} to true
+		set {contraband.%player%} to false
+
+
+
+
+# GUARD HUNGER NOT SO BAD
+on hunger level change:
+	player is not holding a steak or apple
+	player has permission "kdc.guard"
+	chance of 65%:
+		cancel the event
+
+
+
+
+# GUARD NO ITEM DROPS
+on death of a player:
+	player has permission "kdc.guard"
+	loop drops:
+		add loop-item to {_drops::*}
+	delete drops
+	wait 2 ticks
+	while victim is not alive:
+		wait 2 ticks
+		player is not online
+		stop
+	give {_drops::*} to the victim
+
+
+
+# GUARD GOLDEN APPLE HEALTH
+on right click holding a gapple:
+	player has permission "kdc.guard"
+	if player's health is 10:
+		stop
+	else:
+		set the player's health to 10
+		set the player's hunger level to 15
+		remove 1 of the held item from player

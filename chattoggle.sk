@@ -1,0 +1,40 @@
+command /chat <text>:
+	usage: /chat [on/off]
+	description: Used to enable/disable the global chat.
+	permission: kdc.admin
+	trigger:
+		if arg 1 is "off":
+			if {global.chat} is false:
+				send "&3Chat&8 &l|&c Chat is already disabled!"
+				stop
+			else:
+				set {global.chat} to false
+				broadcast "&3Chat&8 &l|&c Chat has been disabled."
+				stop
+		if arg 1 is "on":
+			if {global.chat} is true:
+				send "&3Chat&8 &l|&c Chat is already enabled!"
+				stop
+			else:
+				set {global.chat} to true
+				broadcast "&3Chat&8 &l|&a Chat has been enabled."
+				stop
+		else:
+			send "&3Chat &8&l| &7Error! Please use &b/chat [on/off]&7."
+
+on chat:
+	if {global.chat} is false:
+		player does not have permission "kdc.admin"
+		cancel the event
+		send "&3Chat&8 &l|&c You cannot chat right now!"
+
+on first join:
+	if {global.chat} is true:
+		broadcast "&3%player%&7 has joined the &6Killion Detention Center&7 for the first time!"
+		stop
+	if {global.chat} is false:
+		send "&3%player%&7 has joined the &6Killion Detention Center&7 for the first time!" to player
+		loop all players:
+			if loop-player has permission "kdc.admin":
+				send "&c%loop-player% &8has joined for the first time."
+		stop

@@ -1,0 +1,60 @@
+on right click on sign:
+	if first line is "&4[Buy Chest]":
+		if player's balance is greater than or equal to 2000:
+			if {vc.%player%} is less than or equal to 9:
+				remove 2000 from player's balance
+				send "&6Success! &7You purchased a virtual chest."
+				execute command "pex user %player% add vpack.use.chest"
+				make player execute command "/v c buy"
+				wait 2 ticks
+				execute command "pex user %player% remove vpack.use.chest"
+				add 1 to {vc.%player%}
+				stop
+			else:
+				send "&4Error! &7You already own 10 virtual chests."
+				stop
+		else:
+			send "&4Error! &7You do not have enough money to purchase a chest."
+			stop
+
+	if second line is "Right click me":
+		set {_chestnumb} to 0
+		loop 10 times:
+			add 1 to {_chestnumb}
+			if {_chestnumb} is less than or equal to {vc.%player%}:
+				if first line is "&4[Chest %{_chestnumb}%&4]":
+					execute command "pex user %player% add vpack.use.chest"
+					make player execute command "v c %{_chestnumb}%"
+					wait 2 ticks
+					execute command "pex user %player% remove vpack.use.chest"
+					stop
+			else:
+				send "&4Error! &7You do not own this virtual chest." to player
+				stop
+
+
+command /vcupdate <player> <number>:
+	trigger:
+		set {vc.%arg 1%} to arg 2
+		send "%arg 1% now has %{vc.%arg 1%}% chests."
+
+on sign change:
+	if player doesn't have permission "kdc.admin":
+		if first line is "&4[Buy Chest]" or "&4[Chest 1]" or "&4[Chest 2]" or "&4[Chest 3]" or "&4[Chest 4]" or "&4[Chest 5]" or "&4[Chest 6]" or "&4[Chest 7]" or "&4[Chest 8]" or "&4[Chest 9]" or "&4[Chest 10]" or "bc" or "oc":
+			set first line to "&4Error!"
+			set second line to ""
+			set third line to "You can't do that!"
+			set fourth line to ""
+			stop
+
+	if first line is "bc":
+		set first line to "&4[Buy Chest]"
+		set second line to "Right click me"
+		set third line to "to purchase"
+		set fourth line to "a &bvirtual chest."
+
+	if first line is "oc":
+		set first line to "&4[Chest %line 2%&4]"
+		set second line to "Right click me"
+		set fourth line to "&b&o%line 3% &rchest."
+		set third line to "to open your"

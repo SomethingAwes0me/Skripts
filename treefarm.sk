@@ -1,0 +1,22 @@
+on break of birch log:
+	if y coordinate of block is between 55 and 85:
+		if x coordinate of block is between 250 and 310:
+			if z coordinate of block is between -180 and -250:
+				block below is dirt
+				set block to birch sapling
+
+on place:
+	player doesn't have permission "kdc.admin"
+	block isn't a birch sapling
+	if y coordinate of block is between 55 and 85:
+		if x coordinate of block is between 250 and 310:
+			if z coordinate of block is between -180 and -250:
+				cancel the event
+				send "&8[&4!&8]&7 You cannot place blocks in the tree farm." to player
+
+on break of birch sapling:
+	if y coordinate of block is between 55 and 85:
+		if x coordinate of block is between 250 and 310:
+			if z coordinate of block is between -180 and -250:
+				cancel the event
+				send "&8[&4!&8]&7 You cannot break saplings in the tree farm." to player
