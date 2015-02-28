@@ -35,6 +35,9 @@ on chat:
 
 # Part that makes it so that spam join messages aren't shown.
 on first join:
+	set {justwarned.%player%} to false
+	set {colorchange.%player%} to false
+	set {vc.%player%} to 0
 	if {global.chat} is true:
 		broadcast "&3%player%&7 has joined the &6Killion Detention Center&7 for the first time!"
 		stop

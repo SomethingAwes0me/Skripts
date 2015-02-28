@@ -1,0 +1,83 @@
+on break of snow block:
+	cancel the event
+	set block to air
+	drop 1 snow block at location of the block
+
+
+command /warn <player> <text>:
+	permission: kdc.mod
+	usage: /warn [username] [reason]
+	description: Warn a player which then mutes them for a given amount of time.
+	trigger:
+		if {justwarned.%arg 1%} is false:
+			set {justwarned.%arg 1%} to true
+			set {warntime.%arg 1%} to now
+			broadcast "&6* &c%arg 1% &7has just recieved a &cWARNING: &f%arg 2%"
+			if {warnings.%arg 1%} is 0:
+				execute the command "/tempmute %arg 1% 30m Warning"
+				send "&8[&4*&8]&7 You now have &c1 warning." to arg 1
+				send "&8[&4*&8]&7 Please review the rules at &b&nbit.ly/KDC-rules" to arg 1
+				send "&8[&4*&8]&7 %arg 1% has been muted for 30 minutes and has 1 warning." to command executor
+				set {warning1time.%arg 1%} to now
+				add 1 to {warnings.%arg 1%}
+				stop
+			if {warnings.%arg 1%} is 1:
+				execute the command "/tempmute %arg 1% 3h Warning"
+				send "&8[&4*&8]&7 You now have &c2 warnings." to arg 1
+				send "&8[&4*&8]&7 Please review the rules at &b&nbit.ly/KDC-rules" to arg 1
+				send "&8[&4*&8]&7 %arg 1% has been muted for 3 hours and has 2 warnings." to command executor
+				set {warning2time.%arg 1%} to now
+				add 1 to {warnings.%arg 1%}
+				stop
+			if {warnings.%arg 1%} is 2:
+				execute the command "/tempmute %arg 1% 1d Warning"
+				send "&8[&4*&8]&7 You now have &c3 warnings." to arg 1
+				send "&8[&4*&8]&7 Please review the rules at &b&nbit.ly/KDC-rules" to arg 1
+				send "&8[&4*&8]&7 %arg 1% has been muted for 1 day and has 3 warnings." to command executor
+				set {warning3time.%arg 1%} to now
+				add 1 to {warnings.%arg 1%}
+				stop
+			if {warnings.%arg 1%} is 3:
+				execute the command "/tempmute %arg 1% 3d Warning"
+				send "&8[&4*&8]&7 You now have &c4 warnings." to arg 1
+				send "&8[&4*&8]&7 Please review the rules at &b&nbit.ly/KDC-rules" to arg 1
+				send "&8[&4*&8]&7 %arg 1% has been muted for 3 days and has 4 warnings." to command executor
+				set {warning4time.%arg 1%} to now
+				add 1 to {warnings.%arg 1%}
+				stop
+			if {warnings.%arg 1%} is 4:
+				execute the command "/tempmute %arg 1% 30d Warning"
+				send "&8[&4*&8]&7 You now have &c5 warnings." to arg 1
+				send "&8[&4*&8]&7 Please review the rules at &b&nbit.ly/KDC-rules" to arg 1
+				send "&8[&4*&8]&7 %arg 1% has been muted for 30 days and has 5 warnings." to command executor
+				set {warning5time.%arg 1%} to now
+				add 1 to {warnings.%arg 1%}
+				stop
+		else:
+			send "&8[&4!&8]&7 That player was just warned!" to command executor
+
+every 1 hour:
+	loop all players:
+		if difference between {warning1time.%loop-player%} and now is greater than or equal to 30 days:
+			subtract 1 from {warnings.%loop-player%}
+		if difference between {warning2time.%loop-player%} and now is greater than or equal to 30 days:
+			subtract 1 from {warnings.%loop-player%}
+		if difference between {warning3time.%loop-player%} and now is greater than or equal to 30 days:
+			subtract 1 from {warnings.%loop-player%}
+		if difference between {warning4time.%loop-player%} and now is greater than or equal to 30 days:
+			subtract 1 from {warnings.%loop-player%}
+		if difference between {warning5time.%loop-player%} and now is greater than or equal to 30 days:
+			subtract 1 from {warnings.%loop-player%}
+
+every 5 minutes:
+	loop all players:
+		if difference between {warntime.%loop-player%} and now is greater than or equal to 1 minute:
+			set {justwarned.%loop-player%} to false
+
+command /dwarn <player>:
+	trigger:
+		if {warnings.%arg 1%} is 0:
+			send "&8[&4!&8]&7 That player doesn't have any warnings."
+		else:
+			subtract 1 from {warnings.%arg 1%}
+			send "&8[&2!&8]&7 1 warning removed from &b%arg 1%&7."

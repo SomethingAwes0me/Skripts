@@ -28,11 +28,11 @@ on right click on sign:
 				stop
 			else:
 				# Limit of 10 chests, if they try to buy more given an error.
-				send "&4Error! &7You already own 10 virtual chests."
+				send "&8[&4!&8] &7You already own 10 virtual chests."
 				stop
 		else:
 			# if they don't have enough money - error.
-			send "&4Error! &7You do not have enough money to purchase a chest."
+			send "&8[&4!&8] &7You do not have enough money to purchase a chest."
 			stop
 
 	# OPEN CHEST SIGN
@@ -55,11 +55,12 @@ on right click on sign:
 					execute command "pex user %player% remove vpack.use.chest"
 					stop
 			else:
-				send "&4Error! &7You do not own this virtual chest." to player
+				send "&8[&4!&8] &7You do not own this virtual chest." to player
 				stop
 
 # If the vc.%player% counter some how gets messed up, it can be reset here.
 command /vcupdate <player> <number>:
+	permission: kdc.admin
 	trigger:
 		set {vc.%arg 1%} to arg 2
 		send "%arg 1% now has %{vc.%arg 1%}% chests."
