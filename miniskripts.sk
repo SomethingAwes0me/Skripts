@@ -1,0 +1,5 @@
+# Snow blocks drop snow blocks, not snow balls.
+on break of snow block:
+	cancel the event
+	set block to air
+	drop 1 snow block at location of the block

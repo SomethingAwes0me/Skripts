@@ -1,0 +1,98 @@
+# COMBATTAG / COMBAT LOGGING PLUGIN
+# If a player (attacker or victim) logs out while in combat, then they are slain
+# and their items are dropped on the ground.
+
+# Checks to see if a player has been attacked by another player.
+# If they have, sets them as tagged, and starts the timer.
+on damage:
+	attacker is a player
+	victim is a player
+	if {tagged.%victim%} is false:
+		send "&8[&4!&8]&c You are now in &lcombat&c! &7Do not log out." to victim
+		set {tagged.%victim%} to true
+		set {combattimer.%victim%} to 10
+
+		# Timer to count down until they are untagged.
+		while {combattimer.%victim%} is greater than 0:
+			wait 1 second
+			subtract 1 from {combattimer.%victim%}
+
+		# Send them a message if they're free.
+		if {combattimer.%victim%} is greater than -5:
+			send "&8[&2!&8]&a You are no longer in &lcombat&a! &7You can safely log out." to victim
+		set {tagged.%victim%} to false
+	# This checks to see if they've been tagged and then hit again, increasing the
+	# timer to 10 seconds if they were.
+	if {tagged.%victim%} is true:
+		set {combattimer.%victim%} to 10
+
+# Same thing as above, but for attackers instead of victims.
+on damage:
+	attacker is a player
+	victim is a player
+	if {tagged.%attacker%} is false:
+		send "&8[&4!&8]&c You are now in &lcombat&c! &7Do not log out." to attacker
+		set {tagged.%attacker%} to true
+		set {combattimer.%attacker%} to 10
+
+		while {combattimer.%attacker%} is greater than 0:
+			wait 1 second
+			subtract 1 from {combattimer.%attacker%}
+
+		if {combattimer.%attacker%} is greater than -5:
+			set {tagged.%attacker%} to false
+			send "&8[&2!&8]&a You are no longer in &lcombat&a! &7You can safely log out." to attacker
+
+		set {tagged.%attacker%} to false
+	if {tagged.%attacker%} is true:
+		set {combattimer.%attacker%} to 10
+
+# When a player dies their combat tag expires, and they get a message saying that.
+on death:
+	if {tagged.%player%} is true:
+		set {combattimer.%player%} to -10
+		wait 2 seconds
+		send "&8[&2!&8]&a You are no longer in &lcombat&a! &7You can safely log out." to player
+
+# Just a check to make sure that player's are slain for combat logging if they
+# are kicked.
+on kick:
+	set {tagged.%player%} to false
+
+# If a player was tagged and they log out, then we drop all of their items at
+# their death location, clear their inventory (just a precaution), and kill the player.
+# After all that broadcast it so that everyone knows.
+on logout:
+	if {tagged.%player%} is true:
+		set {combatslain.%player%} to true
+		loop all items in the player's inventory:
+			drop loop-item at player
+		clear player's inventory
+		kill the player
+		broadcast "&cPVP &8&l| &3%player% &7was slain for combat logging."
+
+# When they log in set their tagged status to false, and let them know why
+# they are dead.
+
+# There's a slight glitch where randomly, upon relogging dropped items aren't
+# visible, but relogging fixes that problem so we just include a message letting
+# them know.
+on login:
+	set {tagged.%player%} to false
+	if {combatslain.%player%} is true:
+		set {combatslain.%player%} to false
+		wait 2 seconds
+		send "&d&l---------------------------------------------"
+		send "&8[&4*&8]&7 You were slain for combat logging!"
+		send "&8[&4*&8]&7 You may need to relog in order to see dropped items."
+		send "&d&l---------------------------------------------"
+
+# Command to check how much longer (if at all) they are in combat for.
+command /combattag:
+	aliases: ct, pvptimer
+	trigger:
+		if {combattimer.%player%} is greater than 0:
+			send "&3PVP &8&l|&7 You are in combat for &c%{combattimer.%player%}%&7 seconds."
+			stop
+		else:
+			send "&3PVP &8&l| &7You are not in combat."
