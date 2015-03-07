@@ -1,0 +1,402 @@
+# TICKET SYSTEM
+# Players can use the command /ticketnew [msg] to get support from mods and wardens
+
+
+# Allows players to create a new ticket.
+command /ticketnew [<text>]:
+	usage: /ticketnew [message]
+	description: Create a new ticket.
+	trigger:
+		if arg 1 isn't set:
+			send "&8[&bSupport&8]: &cPlease enter a message describing your issue." to sender
+			stop
+		else:
+			log "%sender%: %arg 1% | at %now% | at %location of player%" to "tickets.log"
+			set {_ticketID} to (size of {totalTickets::*}) + 1
+			set {ticket.Time::%{_ticketID}%} to now
+			set {ticket.Player::%{_ticketID}%} to player
+			set {ticket.Location::%{_ticketID}%} to location of player
+			set {ticket.Assigned::%{_ticketID}%} to "None "
+			set {ticket.Message::%{_ticketID}%} to arg 1
+			set {ticket.Comments::%{_ticketID}%} to "None"
+			set {ticket.CommentTracker.%{_ticketID}%} to 0
+			set {ticket.CommentSender.%{_ticketID}%.0} to None
+			set {ticket.Done::%{_ticketID}%} to false
+			set {ticket.DonePlayer.%{_ticketID}%} to None
+			add 1 to {totalTickets::*}
+			add 1 to {openTickets}
+			send "&8[&bSupport&8]: &aYour ticket has been submitted!" to player
+			send "&8[&bSupport&8]: &7View it with /ticketview &b%{_ticketID}%&7." to player
+			loop all players:
+				if loop-player has permission "kdc.admin":
+					send "&8[&bSupport&8]:&c %sender% has created a ticket &7[ID: &b%{_ticketID}%&7]." to loop-player
+
+			set {_looper} to 0
+			loop size of {totalTickets::*} times:
+				if {ticket.Done::%{_looper}%} is false:
+					set {smallestTicket} to {_looper}
+					stop
+				else:
+					add 1 to {_looper}
+
+# Allows mods/wardens to view all tickets and players to view their own tickets.
+command /ticketview [<text>]:
+	usage: /ticketview [ticket-id]
+	description: View information about the given ticket.
+	trigger:
+		if arg 1 isn't set:
+			send "&8[&bSupport&8]: &cPlease enter a ticket ID." to sender
+			stop
+		if arg 1 parsed as an integer is larger than (size of {totalTickets::*}):
+			send "&8[&bSupport&8]: &cThere is no ticket with that ID." to sender
+			stop
+		if arg 1 parsed as an integer is less than 0:
+			send "&8[&bSupport&8]: &cThere is no ticket with that ID." to sender
+			stop
+		set {_ticketID} to arg 1 parsed as an integer
+
+		if player has permission "kdc.mod":
+			send "&c----------[ Support Tickets &c]----------"
+			send "&3Ticket ID:&b %{_ticketID}%"
+			send "&3Created:&b %{ticket.Time::%{_ticketID}%}%"
+			send "&3Player:&b %{ticket.Player::%{_ticketID}%}%"
+			send "&3Assigned:&b %{ticket.Assigned::%{_ticketID}%}%"
+			send "&3Message: &b%{ticket.Message::%{_ticketID}%}%"
+			set {_commentID} to 1
+
+			if {ticket.CommentTracker.%{_ticketID}%} is 0:
+				send "&3Comments: &7None" to player
+			else:
+				send "&c------------[ Comments ]------------" to player
+				loop {ticket.CommentTracker.%{_ticketID}%} times:
+					send "&3%{ticket.CommentSender.%{_ticketID}%.%{_commentID}%}%: &b%{ticket.Comment.%{_commentID}%.%{_ticketID}%}%" to player
+					add 1 to {_commentID}
+
+			if {ticket.Done::%{_ticketID}%} is true:
+				if {ticket.DoneMessage.%{_ticketID}%} is not set:
+					send "&6%{ticket.DonePlayer.%{_ticketID}%}%&7 marked this ticket as done."
+				else:
+					send "&6%{ticket.DonePlayer.%{_ticketID}%}%&7 marked this ticket as done: &b%{ticket.DoneMessage.%{_ticketID}%}% "			
+
+		else if player is {ticket.Player::%{_ticketID}%}:
+			send "&c----------[ Support Tickets &c]----------"
+			send "&3Ticket ID:&b %{_ticketID}%"
+			send "&3Created:&b %{ticket.Time::%{_ticketID}%}%"
+			send "&3Player:&b %{ticket.Player::%{_ticketID}%}%"
+			send "&3Assigned:&b %{ticket.Assigned::%{_ticketID}%}%"
+			send "&3Message: &b%{ticket.Message::%{_ticketID}%}%"
+			set {_commentID} to 1
+
+			if {ticket.CommentTracker.%{_ticketID}%} is 0:
+				send "&3Comments: &7None" to player
+			else:
+				send "&c------------[ Comments ]------------" to player
+				loop {ticket.CommentTracker.%{_ticketID}%} times:
+					send "&3%{ticket.CommentSender.%{_ticketID}%.%{_commentID}%}%: &b%{ticket.Comment.%{_commentID}%.%{_ticketID}%}%" to player
+					add 1 to {_commentID}
+
+			if {ticket.Done::%{_ticketID}%} is true:
+				if {ticket.DoneMessage.%{_ticketID}%} is not set:
+					send "&6%{ticket.DonePlayer.%{_ticketID}%}%&7 marked this ticket as done."
+				else:
+					send "&6%{ticket.DonePlayer.%{_ticketID}%}%&7 marked this ticket as done: &b%{ticket.DoneMessage.%{_ticketID}%}% "			
+		else:
+			send "&8[&bSupport&8]:&4 You do not have sufficient permissions." to sender
+			stop
+
+
+command /ticketcomment [<text>] [<text>]:
+	trigger:
+		if arg 1 isn't set:
+			send "&8[&bSupport&8]: &cPlease enter a ticket ID." to sender
+			stop
+		if arg 1 parsed as an integer is larger than (size of {totalTickets::*}):
+			send "&8[&bSupport&8]: &cThere is no ticket with that ID." to sender
+			stop
+		if arg 1 parsed as an integer is less than 0:
+			send "&8[&bSupport&8]: &cThere is no ticket with that ID." to sender
+			stop
+		if arg 2 isn't set:
+			send "&8[&bSupport&8]: &cPlease enter a message." to sender
+			stop
+
+		set {_ticketID} to arg 1 parsed as an integer
+		if player has permission "kdc.mod":
+			add 1 to {ticket.CommentTracker.%{_ticketID}%}
+			set {_commentID} to {ticket.CommentTracker.%{_ticketID}%}
+			set {ticket.CommentSender.%{_ticketID}%.%{_commentID}%} to player
+			set {ticket.Comment.%{_commentID}%.%{_ticketID}%} to arg 2
+			send "&8[&bSupport&8]: &aYour comment has been submitted!" to sender
+			send "&8[&bSupport&8]: &6%{ticket.CommentSender.%{_ticketID}%.%{_commentID}%}% &8>> &b %{ticket.Comment.%{_commentID}%.%{_ticketID}%}%" to player
+
+			if sender is not {ticket.Player::%{_ticketID}%}:
+				if {ticket.Player::%{_ticketID}%} is online:
+					send "&8[&bSupport&8]: &3%{ticket.CommentSender.%{_ticketID}%.%{_commentID}%}% &7just commented on your ticket &7[ID: &b%{_ticketID}%&7]." to {ticket.Player::%{_ticketID}%}
+					send "&8[&bSupport&8]: &6%{ticket.CommentSender.%{_ticketID}%.%{_commentID}%}% &8>> &b %{ticket.Comment.%{_commentID}%.%{_ticketID}%}%" to {ticket.Player::%{_ticketID}%}
+
+		else if player is {ticket.Player::%{_ticketID}%}:
+			add 1 to {ticket.CommentTracker.%{_ticketID}%}
+			set {_commentID} to {ticket.CommentTracker.%{_ticketID}%}
+			set {ticket.CommentSender.%{_ticketID}%.%{_commentID}%} to player
+			set {ticket.Comment.%{_commentID}%.%{_ticketID}%} to arg 2
+			send "&8[&bSupport&8]: &aYour comment has been submitted!" to sender
+			send "&8[&bSupport&8]: &6%{ticket.CommentSender.%{_ticketID}%.%{_commentID}%}% &8>> &b %{ticket.Comment.%{_commentID}%.%{_ticketID}%}%" to player
+
+			if sender is not {ticket.Player::%{_ticketID}%}:
+				if {ticket.Player::%{_ticketID}%} is online:
+					send "&8[&bSupport&8]: &3%{ticket.CommentSender.%{_ticketID}%.%{_commentID}%}% &7just commented on your ticket &7[ID: &b%{_ticketID}%&7]." to {ticket.Player::%{_ticketID}%}
+					send "&8[&bSupport&8]: &6%{ticket.CommentSender.%{_ticketID}%.%{_commentID}%}% &8>> &b %{ticket.Comment.%{_commentID}%.%{_ticketID}%}%" to {ticket.Player::%{_ticketID}%}
+
+			loop all players:
+				if loop-player has permission "kdc.mod":
+					if loop-player is not sender:
+						send "&8[&bSupport&8]: &3%{ticket.CommentSender.%{_ticketID}%.%{_commentID}%}% &7just commented on a ticket &7[ID: &b%{_ticketID}%&7]." to loop-player
+						send "&8[&bSupport&8]: &6%{ticket.CommentSender.%{_ticketID}%.%{_commentID}%}% &8>> &b %{ticket.Comment.%{_commentID}%.%{_ticketID}%}%" to loop-player
+		else:
+			send "&8[&bSupport&8]:&4 You do not have sufficient permissions." to sender
+			stop
+
+command /ticketclose [<text>] [<text>]:
+	aliases: /ticketdone
+	usage: /close [ticket-id] [optional: message]
+	description: Closes a ticket
+	trigger:
+		if arg 1 isn't set:
+			send "&8[&bSupport&8]: &cPlease enter a ticket ID." to sender
+			stop
+		if arg 1 parsed as an integer is larger than (size of {totalTickets::*}):
+			send "&8[&bSupport&8]: &cThere is no ticket with that ID." to sender
+			stop
+		if arg 1 parsed as an integer is less than 0:
+			send "&8[&bSupport&8]: &cThere is no ticket with that ID." to sender
+			stop
+
+		set {_ticketID} to arg 1 parsed as an integer
+
+		if {ticket.Done::%{_ticketID}%} is true:
+			send "&8[&bSupport&8]: &cThat ticket is already closed!" to sender
+			stop
+
+		if player has permission "kdc.mod":
+			remove 1 from {openTickets}
+			set {ticket.Done::%{_ticketID}%} to true
+			set {ticket.DonePlayer.%{_ticketID}%} to player
+
+			if arg 2 is set:
+				set {ticket.DoneMessage.%{_ticketID}%} to arg 2
+
+			send "&8[&bSupport&8]: &aTicket &7%{_ticketID}% &asuccessfully closed!" to sender
+
+			if {ticket.Player::%{_ticketID}%} is online:
+				send "&8[&bSupport&8]: &3%sender% &7just closed your ticket &7[ID: &b%{_ticketID}%&7]." to {ticket.Player::%{_ticketID}%}
+				if {ticket.DoneMessage.%{_ticketID}%} is set:
+					send "&8[&bSupport&8]: &6%sender% &8>> &b %{ticket.DoneMessage.%{_ticketID}%}%" to {ticket.Player::%{_ticketID}%}
+
+		else if player is {ticket.Player::%{_ticketID}%}:
+			remove 1 from {openTickets}
+			set {ticket.Done::%{_ticketID}%} to true
+			set {ticket.DonePlayer.%{_ticketID}%} to player
+
+			if arg 2 is set:
+				set {ticket.DoneMessage.%{_ticketID}%} to arg 2
+
+			send "&8[&bSupport&8]: &aTicket &7%{_ticketID}% &asuccessfully closed!" to sender
+
+			if {ticket.Player::%{_ticketID}%} is online:
+				send "&8[&bSupport&8]: &3%sender% &7just closed your ticket &7[ID: &b%{_ticketID}%&7]." to {ticket.Player::%{_ticketID}%}
+				if {ticket.DoneMessage.%{_ticketID}%} is set:
+					send "&8[&bSupport&8]: &6%sender% &8>> &b %{ticket.DoneMessage.%{_ticketID}%}%" to {ticket.Player::%{_ticketID}%}
+		else:
+			send "&8[&bSupport&8]:&4 You do not have sufficient permissions." to sender
+			stop
+
+		loop all players:
+			if loop-player has permission "kdc.mod":
+				if loop-player is not sender:
+					send "&8[&bSupport&8]: &3%sender% &7just closed a ticket &7[ID: &b%{_ticketID}%&7]." to loop-player
+
+				if {ticket.DoneMessage.%{_ticketID}%} is set:
+					send "&8[&bSupport&8]: &6%sender% &8>> &b %{ticket.DoneMessage.%{_ticketID}%}%" to loop-player
+
+
+		set {_looper} to 0
+		loop size of {totalTickets::*} times:
+			if {ticket.Done::%{_looper}%} is false:
+				set {smallestTicket} to {_looper}
+				stop
+			else:
+				add 1 to {_looper}
+
+command /ticketopen [<text>]:
+	permission: kdc.mod
+	usage: /ticketopen [ticket-id]
+	description: Reopens the given ticket.
+	permission message: "&8[&bSupport&8]:&4 You do not have sufficient permissions."
+	trigger:
+		if arg 1 isn't set:
+			send "&8[&bSupport&8]: &cPlease enter a ticket ID." to sender
+			stop
+		if arg 1 parsed as an integer is larger than (size of {totalTickets::*}):
+			send "&8[&bSupport&8]: &cThere is no ticket with that ID." to sender
+			stop
+		if arg 1 parsed as an integer is less than 0:
+			send "&8[&bSupport&8]: &cThere is no ticket with that ID." to sender
+			stop
+
+		set {_ticketID} to arg 1 parsed as an integer
+
+		if {ticket.Done::%{_ticketID}%} is false:
+			send "&8[&bSupport&8]: &cThat ticket is not closed!" to sender
+			stop
+		add 1 to {openTickets}
+		add 1 to {ticket.CommentTracker.%{_ticketID}%}
+		set {_commentID} to {ticket.CommentTracker.%{_ticketID}%}
+		set {ticket.CommentSender.%{_ticketID}%.%{_commentID}%} to player
+		
+		send "&8[&bSupport&8]: &aTicket &7%{_ticketID}% &asuccessfully reopened!" to sender
+
+		if {ticket.Player::%{_ticketID}%} is online:
+			send "&8[&bSupport&8]: &3%sender% &7just reopened your ticket &7[ID: &b%{_ticketID}%&7]." to {ticket.Player::%{_ticketID}%}
+
+		if {ticket.DoneMessage.%{_ticketID}%} is not set:
+			set {ticket.CommentSender.%{_ticketID}%.%{_commentID}%} to player
+			set {ticket.Comment.%{_commentID}%.%{_ticketID}%} to "&aYour ticket was reopened."
+
+		else:
+			set {ticket.CommentSender.%{_ticketID}%.%{_commentID}%} to "&6%{ticket.DonePlayer.%{_ticketID}%}% &7marked this ticket as done"
+			set {ticket.Comment.%{_commentID}%.%{_ticketID}%} to "&b%{ticket.DoneMessage.%{_ticketID}%}%"
+			add 1 to {ticket.CommentTracker.%{_ticketID}%}
+			add 1 to {_commentID}
+			set {ticket.CommentSender.%{_ticketID}%.%{_commentID}%} to player
+			set {ticket.Comment.%{_commentID}%.%{_ticketID}%} to "&aYour ticket was reopened."
+			
+		set {ticket.Done::%{_ticketID}%} to false
+
+		loop all players:
+			if loop-player has permission "kdc.mod":
+				if loop-player is not sender:
+					send "&8[&bSupport&8]: &3%sender% &7just reopened a ticket &7[ID: &b%{_ticketID}%&7]." to loop-player
+
+
+		if {smallestTicket} is greater than {_ticketID}:
+			set {smallestTicket} to {_ticketID}
+
+
+
+command /ticketassign [<text>] [<text>]:
+	permission: kdc.mod
+	usage: /ticketassign [ticket-id] [assignee]
+	description: Asssigns the given player to the given ticket.
+	permission message: "&8[&bSupport&8]:&4 You do not have sufficient permissions."
+	trigger:
+		if arg 1 isn't set:
+			send "&8[&bSupport&8]: &cPlease enter a ticket ID." to sender
+			stop
+		if arg 1 parsed as an integer is larger than (size of {totalTickets::*}):
+			send "&8[&bSupport&8]: &cThere is no ticket with that ID." to sender
+			stop
+		if arg 1 parsed as an integer is less than 0:
+			send "&8[&bSupport&8]: &cThere is no ticket with that ID." to sender
+			stop
+
+		set {_ticketID} to arg 1 parsed as an integer
+
+		if arg 2 isn't set:
+			set {ticket.Assigned::%{_ticketID}%} to player
+
+		else:
+			set {ticket.Assigned::%{_ticketID}%} to arg 2
+
+		set {_asignee} to {ticket.Assigned::%{_ticketID}%}
+
+		if {ticket.Player::%{_ticketID}%} is online:
+			send "&8[&bSupport&8]: &3%{_asignee}% &7was assigned to your ticket &7[ID: &b%{_ticketID}%&7]." to {ticket.Player::%{_ticketID}%}
+
+
+		loop all players:
+			if loop-player has permission "kdc.mod":
+				if loop-player is not sender:
+					send "&8[&bSupport&8]: &3%{_asignee}% &7was assigned to a ticket &7[ID: &b%{_ticketID}%&7]." to loop-player
+				else:
+					send "&8[&bSupport&8]: &3You &7were assigned to a ticket &7[ID: &b%{_ticketID}%&7]." to loop-player
+
+
+command /tickettp [<text>]:
+	permission: kdc.mod
+	usage: /tickettp [ticket-id]
+	description: Teleports the player to the given ticket.
+	permission message: "&8[&bSupport&8]:&4 You do not have sufficient permissions."
+	trigger:
+		if arg 1 isn't set:
+			send "&8[&bSupport&8]: &cPlease enter a ticket ID." to sender
+			stop
+		if arg 1 parsed as an integer is larger than (size of {totalTickets::*}):
+			send "&8[&bSupport&8]: &cThere is no ticket with that ID." to sender
+			stop
+		if arg 1 parsed as an integer is less than 0:
+			send "&8[&bSupport&8]: &cThere is no ticket with that ID." to sender
+			stop
+
+		set {_ticketID} to arg 1 parsed as an integer
+		execute command "/ticketassign %{_ticketID}% %sender%"
+		teleport the player to {ticket.Location::%{_ticketID}%}
+
+command /ticket [<text>]:
+	usage: /ticket [page-number]
+	description: View the open tickets.
+	trigger:
+		if arg 1 parsed as an integer is larger than (size of {totalTickets::*}):
+			send "&8[&bSupport&8]: &cThere is no ticket with that ID." to sender
+			stop
+		if arg 1 parsed as an integer is less than 0:
+			send "&8[&bSupport&8]: &cThere is no ticket with that ID." to sender
+			stop
+		set {_pg} to arg 1 parsed as an integer
+
+		if arg 1 doesn't exist:
+			set {_pg} to 0
+		send "&c----------[ Support Tickets &c]----------"
+		send "&3List of open tickets &7[Page: &b%{_pg}%&7]&3:"
+		add 1 to {_pg}
+		set {_ticketsPosted} to 6 * {_pg} 
+		set {_ticketID} to ({smallestTicket} - 1)
+		set {_actualPosted} to 0
+		set {_notPosted} to 1
+		while {_ticketID} is less than (size of {totalTickets::*}):
+			add 1 to {_ticketID}
+			if {_actualPosted} is greater than 5:
+				stop
+		
+			if {ticket.Done::%{_ticketID}%} is false:
+				if player has permission "kdc.mod":
+					if {_notPosted} is greater than ({_ticketsPosted} - 6):
+						if {ticket.Assigned::%{_ticketID}%} is not "None ":
+							set {_assignedTo} to "&6 -> &b%{ticket.Assigned::%{_ticketID}%}%"
+						else:
+							set {_assignedTo} to ""
+
+							send "&3ID &b%{_ticketID}% &8| &7%{ticket.Player::%{_ticketID}%}% &8 | &7 %{ticket.Time::%{_ticketID}%}% %{_assignedTo}%" to sender
+							add 1 to {_actualPosted}
+					else:
+						add 1 to {_notPosted}
+
+				else if {ticket.Player::%{_ticketID}%} is sender:
+					if {_notPosted} is greater than ({_ticketsPosted} - 6):
+						if {ticket.Assigned::%{_ticketID}%} is not "None ":
+							set {_assignedTo} to "&6 -> &b%{ticket.Assigned::%{_ticketID}%}%"
+						else:
+							set {_assignedTo} to ""
+
+							send "&3ID &b%{_ticketID}% &8| &7%{ticket.Player::%{_ticketID}%}% &8 | &7 %{ticket.Time::%{_ticketID}%}% %{_assignedTo}%" to sender
+							add 1 to {_actualPosted}
+				else:
+					add 1 to {_notPosted}
+
+		if {_actualPosted} is 0:
+			if {_pg} - 1 is 0:
+				send "&3There are no open tickets." to sender
+			else:
+				send "&3There are no tickets to display on this page." to sender
+
+			if {openTickets} is 0:
+				set {smallestTicket} to (size of {totalTickets::*})

@@ -63,6 +63,7 @@ on kick:
 # their death location, clear their inventory (just a precaution), and kill the player.
 # After all that broadcast it so that everyone knows.
 on logout:
+	player does not have permission "kdc.admin"
 	if {tagged.%player%} is true:
 		set {combatslain.%player%} to true
 		loop all items in the player's inventory:
