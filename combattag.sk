@@ -9,6 +9,7 @@ on damage:
 	victim is a player
 	if {tagged.%victim%} is false:
 		send "&8[&4!&8]&c You are now in &lcombat&c! &7Do not log out." to victim
+		send "&8[&4!&8]&3 Tagged by: &6%attacker%" to victim
 		set {tagged.%victim%} to true
 		set {combattimer.%victim%} to 10
 
@@ -32,6 +33,7 @@ on damage:
 	victim is a player
 	if {tagged.%attacker%} is false:
 		send "&8[&4!&8]&c You are now in &lcombat&c! &7Do not log out." to attacker
+		send "&8[&4!&8]&3 Tagged: &6%victim%" to attacker
 		set {tagged.%attacker%} to true
 		set {combattimer.%attacker%} to 10
 
@@ -58,16 +60,28 @@ on death:
 # are kicked.
 on kick:
 	set {tagged.%player%} to false
+command /armor:
+	trigger:
+		clear player's inventory
 
 # If a player was tagged and they log out, then we drop all of their items at
 # their death location, clear their inventory (just a precaution), and kill the player.
 # After all that broadcast it so that everyone knows.
 on logout:
-	player does not have permission "kdc.admin"
+	player does not have permission "kdc.guard"
 	if {tagged.%player%} is true:
 		set {combatslain.%player%} to true
 		loop all items in the player's inventory:
 			drop loop-item at player
+		if helmet is not air:
+			drop player's helmet at player
+		if chestplate is not air:
+			drop player's chestplate at player
+		if leggings are not air:
+			drop player's leggings at player
+		if boots is not air:
+			drop player's boots at player
+
 		clear player's inventory
 		kill the player
 		broadcast "&cPVP &8&l| &3%player% &7was slain for combat logging."

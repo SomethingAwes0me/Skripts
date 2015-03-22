@@ -20,6 +20,8 @@ command /c <player> <text>:
 			set {_weapon} to "bow"
 		else if arg 2 is "l" or "lava":
 			set {_weapon} to "lava bucket"
+		else if arg 2 is "a" or "arrow":
+			set {_weapon} to "arrow"
 		else if arg 2 is "f" or "flint":
 			set {_weapon} to "flint and steel"
 		else if arg 2 is "p" or "potion":
@@ -28,7 +30,6 @@ command /c <player> <text>:
 			set {_weapon} to "sword"
 		
 		send "&8[&9Contraband&8]&6 %command sender% is requesting your %{_weapon}%! &cPlease drop it, or risk being sent to solitary." to arg 1
-		wait 2 seconds
 		send "&8[&9C&8]&6 Requesting %{_weapon}%, please wait..." to executor
 
 		loop 5 times:
@@ -51,7 +52,7 @@ command /c <player> <text>:
 # List of contraband items which will trigger the drop weapons thing if the player
 # drops their contraband.
 aliases:
-	dropweapons = bow, arrow, flint and steel, stone sword, iron sword, gold sword, diamond sword, lava bucket, 373:8232, 373:8264, 373:16424, 373:16456, 373:8268, 373:8236, 373:16460, 373:16428
+	dropweapons = bow, arrow, flint and steel, wood sword, stone sword, iron sword, gold sword, diamond sword, lava bucket, 373:8232, 373:8264, 373:16424, 373:16456, 373:8268, 373:8236, 373:16460, 373:16428
 
 on drop of dropweapons:
 	if {contraband.%player%} is true:

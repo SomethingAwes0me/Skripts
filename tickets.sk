@@ -1,5 +1,4 @@
 # TICKET SYSTEM
-# Players can use the command /ticketnew [msg] to get support from mods and wardens
 
 
 # Allows players to create a new ticket.
@@ -28,7 +27,7 @@ command /ticketnew [<text>]:
 			send "&8[&bSupport&8]: &aYour ticket has been submitted!" to player
 			send "&8[&bSupport&8]: &7View it with /ticketview &b%{_ticketID}%&7." to player
 			loop all players:
-				if loop-player has permission "kdc.admin":
+				if loop-player has permission "kdc.mod":
 					send "&8[&bSupport&8]:&c %sender% has created a ticket &7[ID: &b%{_ticketID}%&7]." to loop-player
 
 			set {_looper} to 0

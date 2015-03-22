@@ -1,0 +1,445 @@
+# SLOTS
+
+# Wardens can sneak and then place a noteblock to create a slot.
+on place of a note block:
+	player has permission "kdc.admin"
+	player is sneaking
+	add 1 to {totalSlots}
+	set {_slotID} to {totalSlots}
+	set {slot.%location of block%} to true
+	set {slot.location.%{_slotID}%} to location at block
+	set {slotID.%location of block%} to {_slotID}
+	set {slot.CurrentlyPlacing.%player%} to true
+	set {slot.CurrentlyPlacingID.%player%} to {_slotID}
+	set {slot.PlacedBlocks.%player%.%{_slotID}%} to 0
+	add iron block to {slot.BlockList.%{_slotID}%::*}
+	add gold block to {slot.BlockList.%{_slotID}%::*}
+	add diamond block to {slot.BlockList.%{_slotID}%::*}
+	add emerald block to {slot.BlockList.%{_slotID}%::*}
+	add obsidian to {slot.BlockList.%{_slotID}%::*}
+	add melon block to {slot.BlockList.%{_slotID}%::*}
+	add tnt to {slot.BlockList.%{_slotID}%::*}
+	set {slot.winner.%{_slotID}%.iron block} to 10
+	set {slot.winner.%{_slotID}%.gold block} to 20
+	set {slot.winner.%{_slotID}%.diamond block} to 30
+	set {slot.winner.%{_slotID}%.emerald block} to 40
+	set {slot.winner.%{_slotID}%.obsidian} to 50
+	set {slot.inuse.%{_slotID}%} to false
+	set {slot.cost.%{_slotID}%} to 100
+	give player 1 glass block named "&b&lLeft &6Bottom Block"
+	give player 1 glass block named "&d&lCenter &6Bottom Block"
+	give player 1 glass block named "&a&lRight &6Bottom Block"
+	send "&8[&2Slots&8]&3 Slot ID: &d%{_slotID}%" to player
+	send "&8[&2Slots&8]&a Congrats! &7This slot just needs a little more tweaking..." to player
+	send ""
+	send "&8[&2Slots&8]&6 Please place the Left/Center/Right Bottom blocks where" to player
+	send "&8[&2Slots&8]&7 you want those respective columns to be." to player
+	send "&8[&2Slots&8]&7 Where the glass block is, is where the bottom block of that column will be." to player
+
+# When a warden places a slot block, he/she is given 3 glass blocks named left bottom/center bottom/right bottm.
+# These blocks need to be placed where the bottom block of each respective column should be
+# for the slot. Once a block is placed the three stone blocks that appear are where the slot will be.
+on place of a glass block:
+	player has permission "kdc.admin"
+	set {_slotID} to {slot.CurrentlyPlacingID.%player%}
+	if {slot.PlacedBlocks.%player%.%{_slotID}%} is greater than 3:
+		set {slot.CurrentlyPlacing.%player%} to false
+
+	if {slot.CurrentlyPlacing.%player%} is true:
+		set {_slotX} to x coordinate of block
+		set {_slotY} to y coordinate of block
+		set {_slotZ} to z coordinate of block
+		if "%name of player's held item%" is "&b&lLeft &6Bottom Block":
+			remove held item from player
+			set block at location ({_slotX}, {_slotY}, {_slotZ}) to stone
+			set {slot.LeftBottom.%{_slotID}%} to location at ({_slotX}, {_slotY}, {_slotZ})
+
+			set block at location ({_slotX}, {_slotY} + 1, {_slotZ}) to stone
+			set {slot.LeftCenter.%{_slotID}%} to location at ({_slotX}, {_slotY} + 1, {_slotZ})
+
+			set block at location ({_slotX}, {_slotY} + 2, {_slotZ}) to stone
+			set {slot.LeftTop.%{_slotID}%} to location at ({_slotX}, {_slotY} + 2, {_slotZ})
+			send "&8[&2Slots&8]&7 Left column successfully set!"
+
+		if "%name of player's held item%" is "&d&lCenter &6Bottom Block":
+			remove held item from player
+			set block at location ({_slotX}, {_slotY}, {_slotZ}) to stone
+			set {slot.MiddleBottom.%{_slotID}%} to location at ({_slotX}, {_slotY}, {_slotZ})
+
+			set block at location ({_slotX}, {_slotY} + 1, {_slotZ}) to stone
+			set {slot.MiddleCenter.%{_slotID}%} to location at ({_slotX}, {_slotY} + 1, {_slotZ})
+
+			set block at location ({_slotX}, {_slotY} + 2, {_slotZ}) to stone
+			set {slot.MiddleTop.%{_slotID}%} to location at ({_slotX}, {_slotY} + 2, {_slotZ})
+			send "&8[&2Slots&8]&7 Center column successfully set!"
+
+		if "%name of player's held item%" is "&a&lRight &6Bottom Block":
+			remove held item from player
+			set block at location ({_slotX}, {_slotY}, {_slotZ}) to stone
+			set {slot.RightBottom.%{_slotID}%} to location at ({_slotX}, {_slotY}, {_slotZ})
+
+			set block at location ({_slotX}, {_slotY} + 1, {_slotZ}) to stone
+			set {slot.RightCenter.%{_slotID}%} to location at ({_slotX}, {_slotY} + 1, {_slotZ})
+
+			set block at location ({_slotX}, {_slotY} + 2, {_slotZ}) to stone
+			set {slot.RightTop.%{_slotID}%} to location at ({_slotX}, {_slotY} + 2, {_slotZ})
+			send "&8[&2Slots&8]&7 Right column successfully set!"
+
+		add 1 to {slot.PlacedBlocks.%player%.%{_slotID}%}	
+
+
+options:
+	randomBlockGen: set {_aRandomBlock} to a random element out of {slot.BlockList.%{_slotID}%::*}
+
+
+# Players can left click on note blocks that are used to control slots in order to start gambling.
+# When they do, all the blocks will start changing and if they get 3 in a row they win!
+on left click on a note block:
+	if {slot.%location of block%} is true:
+		set {_slotID} to {slotID.%location of block%}
+		cancel the event
+		if {slot.inuse.%{_slotID}%} is true:
+			send "&8[&2Slots&8]&c This slot is already in use!" to player
+			stop
+		if player's balance is less than {slot.cost.%{_slotID}%}:
+			send "&8[&2Slots&8]&c You do not have enough money to use this!" to player
+			stop
+		else:
+			remove {slot.cost.%{_slotID}%} from player's balance
+			set {slot.InUse.%{_slotID}%} to true
+			loop 10 times:
+				{@randomBlockGen}
+				set block at {slot.LeftTop.%{_slotID}%} to iron block
+
+				{@randomBlockGen}
+				set block at {slot.MiddleTop.%{_slotID}%} to {_aRandomBlock}
+
+				{@randomBlockGen}
+				set block at {slot.RightTop.%{_slotID}%} to {_aRandomBlock}
+
+
+				wait 0.25 second
+				set block at {slot.LeftCenter.%{_slotID}%} to block above {slot.LeftCenter.%{_slotID}%}
+				set block at {slot.MiddleCenter.%{_slotID}%} to block above {slot.MiddleCenter.%{_slotID}%}
+				set block at {slot.RightCenter.%{_slotID}%} to block above {slot.RightCenter.%{_slotID}%}
+
+				
+				{@randomBlockGen}
+				set block at {slot.LeftTop.%{_slotID}%} to {_aRandomBlock}
+
+				{@randomBlockGen}
+				set block at {slot.MiddleTop.%{_slotID}%} to {_aRandomBlock}
+
+				{@randomBlockGen}
+				set block at {slot.RightTop.%{_slotID}%} to {_aRandomBlock}
+
+
+				wait 0.25 second
+				set block at {slot.LeftBottom.%{_slotID}%} to block above {slot.LeftBottom.%{_slotID}%}
+				set block at {slot.LeftCenter.%{_slotID}%} to block above {slot.LeftCenter.%{_slotID}%}
+				set block at {slot.MiddleBottom.%{_slotID}%} to block above {slot.MiddleBottom.%{_slotID}%}
+				set block at {slot.MiddleCenter.%{_slotID}%} to block above {slot.MiddleCenter.%{_slotID}%}
+				set block at {slot.RightBottom.%{_slotID}%} to block above {slot.RightBottom.%{_slotID}%}
+				set block at {slot.RightCenter.%{_slotID}%} to block above {slot.RightCenter.%{_slotID}%}
+			set {slot.InUse.%{_slotID}%} to false
+
+			if "%block at {slot.LeftTop.%{_slotID}%}%" is "%block at {slot.MiddleTop.%{_slotID}%}%":
+				if "%block at {slot.LeftTop.%{_slotID}%}%" is "%block at {slot.RightTop.%{_slotID}%}%":
+					set {_blockType} to "%block at {slot.LeftTop.%{_slotID}%}%"
+					if "%{_blockType}%" is "melon":
+						give player 32 melon blocks
+						send "&8[&2Slots&8] &6Congrats, high roller! &7You just won &a32 melon blocks&7." to player
+					else if "%{_blockType}%" is "tnt":
+						kill player
+						send "&8[&2Slots&8] &6Sorry, high roller! &7You rolled &43 TNT&7 and were killed&7." to player
+					else:
+						add {slot.winner.%{_slotID}%.%{_blockType}%} to player's balance
+						send "&8[&2Slots&8] &6Congrats, high roller! &7You just won $&a%{slot.winner.%{_slotID}%.%{_blockType}%}%&7." to player
+
+			if "%block at {slot.LeftCenter.%{_slotID}%}%" is "%block at {slot.MiddleCenter.%{_slotID}%}%":
+				if "%block at {slot.LeftCenter.%{_slotID}%}%" is "%block at {slot.RightCenter.%{_slotID}%}%":
+					set {_blockType} to "%block at {slot.LeftCenter.%{_slotID}%}%"
+					if "%{_blockType}%" is "melon":
+						give player 32 melon blocks
+						send "&8[&2Slots&8] &6Congrats, high roller! &7You just won &a32 melon blocks&7." to player
+					else if "%{_blockType}%" is "tnt":
+						kill player
+						send "&8[&2Slots&8] &6Sorry, high roller! &7You rolled &43 TNT&7 and were killed&7." to player
+					else:
+						add {slot.winner.%{_slotID}%.%{_blockType}%} to player's balance
+						send "&8[&2Slots&8] &6Congrats, high roller! &7You just won $&a%{slot.winner.%{_slotID}%.%{_blockType}%}%&7." to player
+
+			if "%block at {slot.LeftBottom.%{_slotID}%}%" is "%block at {slot.MiddleBottom.%{_slotID}%}%":
+				if "%block at {slot.LeftBottom.%{_slotID}%}%" is "%block at {slot.RightBottom.%{_slotID}%}%":
+					set {_blockType} to "%block at {slot.LeftBottom.%{_slotID}%}%"
+					if "%{_blockType}%" is "melon":
+						give player 32 melon blocks
+						send "&8[&2Slots&8] &6Congrats, high roller! &7You just won &a32 melon blocks&7." to player
+					else if "%{_blockType}%" is "tnt":
+						kill player
+						send "&8[&2Slots&8] &6Sorry, high roller! &7You rolled &43 TNT&7 and were killed&7." to player
+					else:
+						add {slot.winner.%{_slotID}%.%{_blockType}%} to player's balance
+						send "&8[&2Slots&8] &6Congrats, high roller! &7You just won $&a%{slot.winner.%{_slotID}%.%{_blockType}%}%&7." to player
+
+			if "%block at {slot.LeftTop.%{_slotID}%}%" is "%block at {slot.MiddleCenter.%{_slotID}%}%":
+				if "%block at {slot.LeftTop.%{_slotID}%}%" is "%block at {slot.RightBottom.%{_slotID}%}%":
+					set {_blockType} to "%block at {slot.LeftTop.%{_slotID}%}%"
+					if "%{_blockType}%" is "melon":
+						give player 32 melon blocks
+						send "&8[&2Slots&8] &6Congrats, high roller! &7You just won &a32 melon blocks&7." to player
+					else if "%{_blockType}%" is "tnt":
+						kill player
+						send "&8[&2Slots&8] &6Sorry, high roller! &7You rolled &43 TNT&7 and were killed&7." to player
+					else:
+						add {slot.winner.%{_slotID}%.%{_blockType}%} to player's balance
+						send "&8[&2Slots&8] &6Congrats, high roller! &7You just won $&a%{slot.winner.%{_slotID}%.%{_blockType}%}%&7." to player
+
+			if "%block at {slot.RightTop.%{_slotID}%}%" is "%block at {slot.MiddleCenter.%{_slotID}%}%":
+				if "%block at {slot.RightTop.%{_slotID}%}%" is "%block at {slot.LeftBottom.%{_slotID}%}%":
+					set {_blockType} to "%block at {slot.RightTop.%{_slotID}%}%"
+					if "%{_blockType}%" is "melon":
+						give player 32 melon blocks
+						send "&8[&2Slots&8] &6Congrats, high roller! &7You just won &a32 melon blocks&7." to player
+					else if "%{_blockType}%" is "tnt":
+						kill player
+						send "&8[&2Slots&8] &6Sorry, high roller! &7You rolled &43 TNT&7 and were killed&7." to player
+					else:
+						add {slot.winner.%{_slotID}%.%{_blockType}%} to player's balance
+						send "&8[&2Slots&8] &6Congrats, high roller! &7You just won $&a%{slot.winner.%{_slotID}%.%{_blockType}%}%&7." to player
+
+
+
+# If a warden sneaks and right clicks, he/she can see the percentages of each block for that slot.
+# If a warden or player just right clicks, he/she can see the win amounts and cost for that slot.
+on right click on note block:
+	if player is sneaking:
+		if player has permission "kdc.admin":
+			if {slot.%location of block%} is true:
+				set {_slotID} to {slotID.%location of block%}
+				cancel the event
+
+				set {_looper} to 1
+				loop (size of {slot.BlockList.%{_slotID}%::*}) times:
+					if "%{slot.BlockList.%{_slotID}%::%{_looper}%}%" is "iron block":
+						add 1 to {_ironPercent}
+					if "%{slot.BlockList.%{_slotID}%::%{_looper}%}%" is "gold block":
+						add 1 to {_goldPercent}
+					if "%{slot.BlockList.%{_slotID}%::%{_looper}%}%" is "diamond block":
+						add 1 to {_diamondPercent}
+					if "%{slot.BlockList.%{_slotID}%::%{_looper}%}%" is "emerald block":
+						add 1 to {_emeraldPercent}
+					if "%{slot.BlockList.%{_slotID}%::%{_looper}%}%" is "obsidian":
+						add 1 to {_obsidianPercent}
+					if "%{slot.BlockList.%{_slotID}%::%{_looper}%}%" is "melon" or "melon block":
+						add 1 to {_melonPercent}
+					if "%{slot.BlockList.%{_slotID}%::%{_looper}%}%" is "tnt" or "tnt block":
+						add 1 to {_tntPercent}
+					add 1 to {_looper}
+
+				set {_ironPercent} to ({_ironPercent} / (size of {slot.BlockList.%{_slotID}%::*})) * 100
+				set {_goldPercent} to ({_goldPercent} / (size of {slot.BlockList.%{_slotID}%::*})) * 100
+				set {_diamondPercent} to ({_diamondPercent} / (size of {slot.BlockList.%{_slotID}%::*})) * 100
+				set {_emeraldPercent} to ({_emeraldPercent} / (size of {slot.BlockList.%{_slotID}%::*})) * 100
+				set {_obsidianPercent} to ({_obsidianPercent} / (size of {slot.BlockList.%{_slotID}%::*})) * 100
+				set {_melonPercent} to ({_melonPercent} / (size of {slot.BlockList.%{_slotID}%::*})) * 100
+				set {_tntPercent} to ({_tntPercent} / (size of {slot.BlockList.%{_slotID}%::*})) * 100
+
+				send "&8[&2Slots&8] &7Iron Percent: &7%{_ironPercent}%&a%%" to player
+				send "&8[&2Slots&8] &6Gold Percent: &7%{_goldPercent}%&a%%" to player
+				send "&8[&2Slots&8] &bDiamond Percent: &7%{_diamondPercent}%&a%%" to player
+				send "&8[&2Slots&8] &aEmerald Percent: &7%{_emeraldPercent}%&a%%" to player
+				send "&8[&2Slots&8] &5Obsidian Percent: &7%{_obsidianPercent}%&a%%" to player
+				send "&8[&2Slots&8] &2Melon Percent: &7%{_melonPercent}%&a%%" to player
+				send "&8[&2Slots&8] &4TNT Percent: &7%{_tntPercent}%&a%%" to player
+
+	else:
+		set {_slotID} to {slotID.%location of block%}
+		cancel the event
+		send "&8[&2Slots&8] &3Slot Cost: &d%{slot.cost.%{_slotID}%}%" to player
+		send "&8[&2Slots&8] &7Iron Prize: &a$&7%{slot.winner.%{_slotID}%.iron block}%" to player
+		send "&8[&2Slots&8] &6Gold Prize: &a$&7%{slot.winner.%{_slotID}%.gold block}%" to player
+		send "&8[&2Slots&8] &bDiamond Prize: &a$&7%{slot.winner.%{_slotID}%.diamond block}%" to player
+		send "&8[&2Slots&8] &aEmerald Prize: &a$&7%{slot.winner.%{_slotID}%.emerald block}%" to player
+		send "&8[&2Slots&8] &5Obsidian Prize: &a$&7%{slot.winner.%{_slotID}%.obsidian}%" to player
+		send "&8[&2Slots&8] &2Melon Prize: &732 melon blocks" to player
+		send "&8[&2Slots&8] &4TNT Prize: &7Death" to player
+
+
+# Wardens can use this command to set the win amount for a given block type on a given slot.
+command /slotwins [<text>] [<text>] [<text>]:
+	permission: kdc.admin
+	usage: /slotwins [slot ID] [reward amount] [block type]
+	description: Sets the amount of prize money a player gets for getting 3 in a row of a given block type.
+	permission message: "&8[&2Slots&8]&4 You do not have sufficient permissions."
+	trigger:
+		if arg 1 is not set:
+			send "&8[&2Slots&8] &cPlease enter a slot ID." to player
+			stop
+		if arg 2 is not set:
+			send "&8[&2Slots&8] &cPlease enter a reward amount." to player
+			stop
+		if arg 3 is not set:
+			send "&8[&2Slots&8] &cPlease enter a block type." to player
+			stop
+		set {_slotID} to arg 1 parsed as an integer
+		set {_winAmount} to arg 2 parsed as an integer
+		set {_blockType} to arg 3
+
+		set {slot.winner.%{_slotID}%.%{_blockType}%} to {_winAmount}
+		send "&8[&2Slots&8] &7Players who land &b%{_blockType}%&7 on slot ID &6%{_slotID}%&7 will win: $&a%{_winAmount}%&7." to player
+
+
+
+
+# Wardens can use this command to set the percents for a given block type on a given slot.
+# These are not exact percentages -- keep upping the number that you're adding until the
+# percent read-out gives you the number you're going for.
+#
+# It can take some tweaking but should work out.
+command /slotpercents [<text>] [<text>] [<text>]:
+	permission: kdc.admin
+	usage: /slotpercents [slot ID] [percent amount] [block type]
+	description: Sets the amount of given block type to the given percentage amount. Not an exact percent, but can be used to tweak it.
+	permission message: "&8[&2Slots&8]&4 You do not have sufficient permissions."
+	trigger:
+		if arg 1 is not set:
+			send "&8[&2Slots&8] &cPlease enter a slot ID." to player
+			stop
+		if arg 2 is not set:
+			send "&8[&2Slots&8] &cPlease enter a percentage." to player
+			stop
+		if arg 3 is not set:
+			send "&8[&2Slots&8] &cPlease enter a block type." to player
+			stop
+		set {_slotID} to arg 1 parsed as an integer
+		set {_percentage} to arg 2 parsed as an integer
+		set {_blockType} to arg 3
+		if {_percentage} is greater than 150:
+			send "&8[&2Slots&8] &cError! &7That percentage is too large."
+			stop
+
+		send "&8[&2Slots&8] &7Updating slot percentages. Please wait..." to player
+
+		set {_looper} to 1
+		loop (size of {slot.BlockList.%{_slotID}%::*}) times:
+			if "%{slot.BlockList.%{_slotID}%::%{_looper}%}%" is "%{_blockType}%":
+				delete {slot.BlockList.%{_slotID}%::%{_looper}%}
+			add 1 to {_looper}
+
+		loop {_percentage} times:
+			if "%arg 3%" is "iron" or "iron block":
+				add iron block to {slot.BlockList.%{_slotID}%::*}
+			if "%arg 3%" is "gold" or "gold block":
+				add gold block to {slot.BlockList.%{_slotID}%::*}
+			if "%arg 3%" is "diamond" or "diamond block":
+				add diamond block to {slot.BlockList.%{_slotID}%::*}
+			if "%arg 3%" is "emerald" or "emerald block":
+				add emerald block to {slot.BlockList.%{_slotID}%::*}
+			if "%arg 3%" is "obsidian" or "obsidian block":
+				add obsidian to {slot.BlockList.%{_slotID}%::*}
+			if "%arg 3%" is "melon" or "melon block":
+				add melon block to {slot.BlockList.%{_slotID}%::*}
+			if "%arg 3%" is "tnt" or "tnt block":
+				add tnt to {slot.BlockList.%{_slotID}%::*}
+
+
+		set {_looper} to 1
+		loop (size of {slot.BlockList.%{_slotID}%::*}) times:
+			if "%{slot.BlockList.%{_slotID}%::%{_looper}%}%" is "iron block":
+				add 1 to {_ironPercent}
+			if "%{slot.BlockList.%{_slotID}%::%{_looper}%}%" is "gold block":
+				add 1 to {_goldPercent}
+			if "%{slot.BlockList.%{_slotID}%::%{_looper}%}%" is "diamond block":
+				add 1 to {_diamondPercent}
+			if "%{slot.BlockList.%{_slotID}%::%{_looper}%}%" is "emerald block":
+				add 1 to {_emeraldPercent}
+			if "%{slot.BlockList.%{_slotID}%::%{_looper}%}%" is "obsidian":
+				add 1 to {_obsidianPercent}
+			if "%{slot.BlockList.%{_slotID}%::%{_looper}%}%" is "melon" or "melon block":
+				add 1 to {_melonPercent}
+			if "%{slot.BlockList.%{_slotID}%::%{_looper}%}%" is "tnt" or "tnt block":
+				add 1 to {_tntPercent}
+			add 1 to {_looper}
+
+		set {_ironPercent} to ({_ironPercent} / (size of {slot.BlockList.%{_slotID}%::*})) * 100
+		set {_goldPercent} to ({_goldPercent} / (size of {slot.BlockList.%{_slotID}%::*})) * 100
+		set {_diamondPercent} to ({_diamondPercent} / (size of {slot.BlockList.%{_slotID}%::*})) * 100
+		set {_emeraldPercent} to ({_emeraldPercent} / (size of {slot.BlockList.%{_slotID}%::*})) * 100
+		set {_obsidianPercent} to ({_obsidianPercent} / (size of {slot.BlockList.%{_slotID}%::*})) * 100
+		set {_melonPercent} to ({_melonPercent} / (size of {slot.BlockList.%{_slotID}%::*})) * 100
+		set {_tntPercent} to ({_tntPercent} / (size of {slot.BlockList.%{_slotID}%::*})) * 100
+
+		send "&8[&2Slots&8] &bSuccess! &7Slot percentages updated:" to player
+		send "&8[&2Slots&8] &7Iron Percent: &7%{_ironPercent}%&a%%" to player
+		send "&8[&2Slots&8] &6Gold Percent: &7%{_goldPercent}%&a%%" to player
+		send "&8[&2Slots&8] &bDiamond Percent: &7%{_diamondPercent}%&a%%" to player
+		send "&8[&2Slots&8] &aEmerald Percent: &7%{_emeraldPercent}%&a%%" to player
+		send "&8[&2Slots&8] &5Obsidian Percent: &7%{_obsidianPercent}%&a%%" to player
+		send "&8[&2Slots&8] &2Melon Percent: &7%{_melonPercent}%&a%%" to player
+		send "&8[&2Slots&8] &4TNT Percent: &7%{_tntPercent}%&a%%" to player
+
+
+
+# Sets the cost for using a given slot.
+command /slotcost [<text>] [<text>]:
+	permission: kdc.admin
+	usage: /cost [slot ID] [cost]
+	description: Sets the cost for using a given slot.
+	permission message: "&8[&2Slots&8]&4 You do not have sufficient permissions."
+	trigger:
+		if arg 1 is not set:
+			send "&8[&2Slots&8] &cPlease enter a slot ID." to player
+			stop
+		if arg 2 is not set:
+			send "&8[&2Slots&8] &cPlease enter a cost." to player
+			stop
+		set {_slotID} to arg 1 parsed as an integer
+		set {_slotCost} to arg 2 parsed as an integer
+		set {slot.cost.%{_slotID}%} to {_slotCost}
+		send "&8[&2Slots&8] &bSuccess! &7Slot cost updated [&6ID %{_slotID}% &7costs &a%{_slotCost}%&7]." to player
+
+
+# Deletes the given slot. Cannot be undone!
+command /slotdelete [<text>]:
+	permission: kdc.admin
+	usage: /slotdelete [slot ID]
+	description: Deletes a slot.
+	permission message: "&8[&2Slots&8]&4 You do not have sufficient permissions."
+	trigger:
+		if arg 1 is not set:
+			send "&8[&2Slots&8] &cPlease enter a slot ID." to player
+			stop
+		set {_slotID} to arg 1 parsed as an integer
+		delete {slot.BlockList.%{_slotID}%::*}
+		set block at {slot.location.%{_slotID}%} to air
+		set {_slotBlockLocation} to {slot.location.%{_slotID}%}
+		delete {slot.location.%{_slotID}%}
+		delete {slot.%{_slotBlockLocation}%}
+		delete {slotID.%{_slotBlockLocation}%}
+		delete {slot.PlacedBlocks.%player%.%{_slotID}%}
+		delete {slot.winner.%{_slotID}%.iron block}
+		delete {slot.winner.%{_slotID}%.gold block}
+		delete {slot.winner.%{_slotID}%.diamond block}
+		delete {slot.winner.%{_slotID}%.emerald block}
+		delete {slot.winner.%{_slotID}%.obsidian}
+		set block at {slot.LeftTop.%{_slotID}%} to air
+		set block at {slot.LeftBottom.%{_slotID}%} to air
+		set block at {slot.LeftCenter.%{_slotID}%} to air
+		set block at {slot.MiddleTop.%{_slotID}%} to air
+		set block at {slot.MiddleBottom.%{_slotID}%} to air
+		set block at {slot.MiddleCenter.%{_slotID}%} to air
+		set block at {slot.RightTop.%{_slotID}%} to air
+		set block at {slot.RightBottom.%{_slotID}%} to air
+		set block at {slot.RightCenter.%{_slotID}%} to air
+		delete {slot.LeftTop.%{_slotID}%} 
+		delete {slot.LeftBottom.%{_slotID}%} 
+		delete {slot.LeftCenter.%{_slotID}%} 
+		delete {slot.MiddleTop.%{_slotID}%} 
+		delete {slot.MiddleBottom.%{_slotID}%} 
+		delete {slot.MiddleCenter.%{_slotID}%} 
+		delete {slot.RightTop.%{_slotID}%} 
+		delete {slot.RightBottom.%{_slotID}%} 
+		delete {slot.RightCenter.%{_slotID}%} 
+		send "&8[&2Slots&8]&c Slot &7[ID: %{_slotID}%]&c was successfully deleted."
+

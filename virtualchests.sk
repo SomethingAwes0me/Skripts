@@ -9,8 +9,10 @@
 # Skript also tracks how many chests the user has so that correct
 # messages are printed out when a player buys a chest or tries to
 # access their chest.
-on right click on sign:
+on right click:
 	# BUY CHEST SIGN
+	if {vc.%player%} is not set:
+		set {vc.%player%} to 0
 	if first line is "&4[Buy Chest]":
 		if player's balance is greater than or equal to 2000:
 			# {vc.%player%} is what tracks how many chests the user has.

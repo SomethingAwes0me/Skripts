@@ -1,1 +1,3 @@
 # NOTHING HERE
+every 2 minutes:	
+	execute command "/time noon"

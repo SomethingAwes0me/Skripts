@@ -8,7 +8,7 @@ command /rankup:
 		if player has permission "ranks.highest":
 			send "&8[&6&oRankup&8] &4Error!&7 /rankup is only for C, B, A, or Elite prisoners!"
 			stop
-		if player has permission "ranks.elite":
+		else if player has permission "ranks.elite":
 			if player's balance is greater than or equal to 100000:
 				set player's balance to player's balance - 100000
 				execute command "pex user %player% group set Free"
@@ -20,7 +20,7 @@ command /rankup:
 				set {_needed} to 100000 - {_bal}
 				send "&8[&6&oRankup&8] &4Error!&7 You need &b%{_needed}%&7 more dollars for &dFree&7." to player
 				stop
-		if player has permission "ranks.a":
+		else if player has permission "ranks.a":
 			if player's balance is greater than or equal to 65000:
 				set player's balance to player's balance - 65000
 				execute command "pex user %player% group set Elite-Prisoner"
@@ -32,7 +32,7 @@ command /rankup:
 				set {_needed} to 65000 - {_bal}
 				send "&8[&6&oRankup&8] &4Error!&7 You need &b%{_needed}%&7 more dollars for &5Elite&7." to player
 				stop
-		if player has permission "ranks.b":
+		else if player has permission "ranks.b":
 			if player's balance is greater than or equal to 35000:
 				set player's balance to player's balance - 35000
 				execute command "pex user %player% group set A-Prisoner"
@@ -44,7 +44,7 @@ command /rankup:
 				set {_needed} to 35000 - {_bal}
 				send "&8[&6&oRankup&8] &4Error!&7 You need &b%{_needed}%&7 more dollars for &3A&7." to player
 				stop
-		if player has permission "ranks.c":
+		else if player has permission "ranks.c":
 			if player's balance is greater than or equal to 15000:
 				set player's balance to player's balance - 15000
 				execute command "pex user %player% group set B-Prisoner"
