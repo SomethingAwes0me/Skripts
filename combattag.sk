@@ -2,6 +2,8 @@
 # If a player (attacker or victim) logs out while in combat, then they are slain
 # and their items are dropped on the ground.
 
+options:
+	no_combat_log_permission: kdc.guard
 # Checks to see if a player has been attacked by another player.
 # If they have, sets them as tagged, and starts the timer.
 on damage:
@@ -60,15 +62,12 @@ on death:
 # are kicked.
 on kick:
 	set {tagged.%player%} to false
-command /armor:
-	trigger:
-		clear player's inventory
 
 # If a player was tagged and they log out, then we drop all of their items at
 # their death location, clear their inventory (just a precaution), and kill the player.
 # After all that broadcast it so that everyone knows.
 on logout:
-	player does not have permission "kdc.guard"
+	player does not have permission "{@no_combat_log_permission}"
 	if {tagged.%player%} is true:
 		set {combatslain.%player%} to true
 		loop all items in the player's inventory:

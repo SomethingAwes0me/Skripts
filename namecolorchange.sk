@@ -2,10 +2,12 @@
 # Plugin to allow people to change the color of their own name through a system
 # of name change color credits.
 
+options:
+	admin_permission: kdc.admin
 # /addcolor gives the specified player a number of name color change credits
 # which can then be used to change the color of their name.
 command /addcolor <player> <integer>:
-	permission: kdc.admin
+	permission: {@admin_permission}
 	aliases: /acc
 	usage: /addcolor [username] [credits-to-add]
 	description: Add color credits to a player's account.
@@ -18,7 +20,7 @@ command /addcolor <player> <integer>:
 # /removecolor removes the given number of name color change credits from the given
 # player.
 command /removecolor <player> <integer>:
-	permission: kdc.admin
+	permission: {@admin_permission}
 	aliases: /rc, /rcc
 	usage: /removecolor [username] [credits-to-remove]
 	description: Remove color credits from a player's account.
@@ -40,7 +42,7 @@ command /checkcolor:
 # list of all the possible colors they can change to.
 
 # After the colors are presented it prompts the user to type the name of
-# the color the ywant into chat.
+# the color they want into chat.
 command /changecolor:
 	usage: /changecolor
 	description: Change the color of your name.

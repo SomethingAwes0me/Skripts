@@ -1,11 +1,17 @@
 # Toggles the global chat in case of spam attacks, bot attacks, or the like.
 # Using /chat off not only disables the global chat, but also does not send the
 # first join messages to anyone who isn't an admin.
+options:
+	server_name: Killion Detention Center
+	admin_permission: kdc.admin
+	
+on skript start:
+	set {global.chat} to true
 
 command /chat <text>:
 	usage: /chat [on/off]
 	description: Used to enable/disable the global chat.
-	permission: kdc.admin
+	permission: {@admin_permission}
 	trigger:
 		if arg 1 is "off":
 			if {global.chat} is false:
@@ -29,7 +35,7 @@ command /chat <text>:
 # Actual part that makes sure people can't chat when the chat is disabled.
 on chat:
 	if {global.chat} is false:
-		player does not have permission "kdc.admin"
+		player does not have permission "{@admin_permission}"
 		cancel the event
 		send "&3Chat&8 &l|&c You cannot chat right now!"
 
@@ -38,12 +44,16 @@ on first join:
 	set {justwarned.%player%} to false
 	set {colorchange.%player%} to false
 	set {vc.%player%} to 0
+	set {warnings.%player%} to 0
+	set {tagged.%player%} to false
+	set {changecredits.%player%} to 0
+	broadcast "D"
 	if {global.chat} is true:
-		broadcast "&3%player%&7 has joined the &6Killion Detention Center&7 for the first time!"
+		broadcast "&3%player%&7 has joined the &6{@server_name}&7 for the first time!"
 		stop
 	if {global.chat} is false:
-		send "&3%player%&7 has joined the &6Killion Detention Center&7 for the first time!" to player
+		send "&3%player%&7 has joined the &6{@server_name}&7 for the first time!" to player
 		loop all players:
-			if loop-player has permission "kdc.admin":
+			if loop-player has permission "{@admin_permission}":
 				send "&c%loop-player% &8has joined for the first time."
 		stop

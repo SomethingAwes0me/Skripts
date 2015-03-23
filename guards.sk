@@ -3,12 +3,14 @@
 # contraband. B = bow; L = Lava Bucket; F = Flint and Steel; P = Damage Potion;
 # S = Sword
 
+options:
+	guard_permission: kdc.guard
 # Gives players 5 seconds to drop their contaband before alerting the guard that
 # they failed to surrender contraband.
 # Players are not automatically jailed, so it still requires guards to use the
 # jail command.
 command /c <player> <text>:
-	permission: kdc.guard
+	permission: {@guard_permission}
 	aliases: /contraband, /contrabandcall
 	usage: /c [username] [b(ow) / l(ava) / f(lint) / p(otion) / s(word)]
 	description: Call for a user's contraband.
@@ -68,7 +70,7 @@ on drop of dropweapons:
 # 65% of the time.
 on hunger level change:
 	player is not holding a steak or apple or gapple
-	player has permission "kdc.guard"
+	player has permission "{@guard_permission}"
 	chance of 65%:
 		cancel the event
 
@@ -78,7 +80,7 @@ on hunger level change:
 # GUARD NO ITEM DROPS
 # Makes it so that guards don't drop items upon death.
 on death of a player:
-	player has permission "kdc.guard"
+	player has permission "{@guard_permission}"
 	loop drops:
 		add loop-item to {_drops::*}
 	delete drops
@@ -95,7 +97,7 @@ on death of a player:
 # Makes it so that a guard can right click while holding a golden apple to
 # get 10 health and full hunger.
 on right click holding a gapple:
-	player has permission "kdc.guard"
+	player has permission "{@guard_permission}"
 	if player's health is 10:
 		stop
 	else:

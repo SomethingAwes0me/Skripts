@@ -100,7 +100,7 @@ command /ticketview [<text>]:
 				else:
 					send "&6%{ticket.DonePlayer.%{_ticketID}%}%&7 marked this ticket as done: &b%{ticket.DoneMessage.%{_ticketID}%}% "			
 		else:
-			send "&8[&bSupport&8]:&4 You do not have sufficient permissions." to sender
+			send "&8[&bSupport&8]:&c You do not have sufficient permissions." to sender
 			stop
 
 
@@ -152,7 +152,7 @@ command /ticketcomment [<text>] [<text>]:
 						send "&8[&bSupport&8]: &3%{ticket.CommentSender.%{_ticketID}%.%{_commentID}%}% &7just commented on a ticket &7[ID: &b%{_ticketID}%&7]." to loop-player
 						send "&8[&bSupport&8]: &6%{ticket.CommentSender.%{_ticketID}%.%{_commentID}%}% &8>> &b %{ticket.Comment.%{_commentID}%.%{_ticketID}%}%" to loop-player
 		else:
-			send "&8[&bSupport&8]:&4 You do not have sufficient permissions." to sender
+			send "&8[&bSupport&8]:&c You do not have sufficient permissions." to sender
 			stop
 
 command /ticketclose [<text>] [<text>]:
@@ -206,7 +206,7 @@ command /ticketclose [<text>] [<text>]:
 				if {ticket.DoneMessage.%{_ticketID}%} is set:
 					send "&8[&bSupport&8]: &6%sender% &8>> &b %{ticket.DoneMessage.%{_ticketID}%}%" to {ticket.Player::%{_ticketID}%}
 		else:
-			send "&8[&bSupport&8]:&4 You do not have sufficient permissions." to sender
+			send "&8[&bSupport&8]:&c You do not have sufficient permissions." to sender
 			stop
 
 		loop all players:
@@ -230,7 +230,7 @@ command /ticketopen [<text>]:
 	permission: kdc.mod
 	usage: /ticketopen [ticket-id]
 	description: Reopens the given ticket.
-	permission message: "&8[&bSupport&8]:&4 You do not have sufficient permissions."
+	permission message: &8[&bSupport&8]:&c You do not have sufficient permissions.
 	trigger:
 		if arg 1 isn't set:
 			send "&8[&bSupport&8]: &cPlease enter a ticket ID." to sender
@@ -286,7 +286,7 @@ command /ticketassign [<text>] [<text>]:
 	permission: kdc.mod
 	usage: /ticketassign [ticket-id] [assignee]
 	description: Asssigns the given player to the given ticket.
-	permission message: "&8[&bSupport&8]:&4 You do not have sufficient permissions."
+	permission message: &8[&bSupport&8]:&c You do not have sufficient permissions.
 	trigger:
 		if arg 1 isn't set:
 			send "&8[&bSupport&8]: &cPlease enter a ticket ID." to sender
@@ -324,7 +324,7 @@ command /tickettp [<text>]:
 	permission: kdc.mod
 	usage: /tickettp [ticket-id]
 	description: Teleports the player to the given ticket.
-	permission message: "&8[&bSupport&8]:&4 You do not have sufficient permissions."
+	permission message: &8[&bSupport&8]:&c You do not have sufficient permissions.
 	trigger:
 		if arg 1 isn't set:
 			send "&8[&bSupport&8]: &cPlease enter a ticket ID." to sender

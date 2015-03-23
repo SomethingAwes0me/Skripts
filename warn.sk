@@ -9,6 +9,8 @@
 # People who get warned get a message telling them how many warnings they
 # have, and a link to the rules.
 
+options:
+	rules_link: bit.ly/KDC-rules
 command /warn <player> <text>:
 	permission: kdc.mod
 	usage: /warn [username] [reason]
@@ -27,7 +29,7 @@ command /warn <player> <text>:
 			if {warnings.%arg 1%} is 0:
 				execute the command "/tempmute %arg 1% 30m Warning"
 				send "&8[&4*&8]&7 You now have &c1 warning." to arg 1
-				send "&8[&4*&8]&7 Please review the rules at &b&nbit.ly/KDC-rules" to arg 1
+				send "&8[&4*&8]&7 Please review the rules at &b&n{@rules_link}" to arg 1
 				send "&8[&4*&8]&7 %arg 1% has been muted for 30 minutes and has 1 warning." to command executor
 				set {warning1time.%arg 1%} to now
 				add 1 to {warnings.%arg 1%}
@@ -37,7 +39,7 @@ command /warn <player> <text>:
 			if {warnings.%arg 1%} is 1:
 				execute the command "/tempmute %arg 1% 3h Warning"
 				send "&8[&4*&8]&7 You now have &c2 warnings." to arg 1
-				send "&8[&4*&8]&7 Please review the rules at &b&nbit.ly/KDC-rules" to arg 1
+				send "&8[&4*&8]&7 Please review the rules at &b&n{@rules_link}" to arg 1
 				send "&8[&4*&8]&7 %arg 1% has been muted for 3 hours and has 2 warnings." to command executor
 				set {warning2time.%arg 1%} to now
 				add 1 to {warnings.%arg 1%}
@@ -47,7 +49,7 @@ command /warn <player> <text>:
 			if {warnings.%arg 1%} is 2:
 				execute the command "/tempmute %arg 1% 1d Warning"
 				send "&8[&4*&8]&7 You now have &c3 warnings." to arg 1
-				send "&8[&4*&8]&7 Please review the rules at &b&nbit.ly/KDC-rules" to arg 1
+				send "&8[&4*&8]&7 Please review the rules at &b&n{@rules_link}" to arg 1
 				send "&8[&4*&8]&7 %arg 1% has been muted for 1 day and has 3 warnings." to command executor
 				set {warning3time.%arg 1%} to now
 				add 1 to {warnings.%arg 1%}
@@ -57,7 +59,7 @@ command /warn <player> <text>:
 			if {warnings.%arg 1%} is 3:
 				execute the command "/tempmute %arg 1% 3d Warning"
 				send "&8[&4*&8]&7 You now have &c4 warnings." to arg 1
-				send "&8[&4*&8]&7 Please review the rules at &b&nbit.ly/KDC-rules" to arg 1
+				send "&8[&4*&8]&7 Please review the rules at &b&n{@rules_link}" to arg 1
 				send "&8[&4*&8]&7 %arg 1% has been muted for 3 days and has 4 warnings." to command executor
 				set {warning4time.%arg 1%} to now
 				add 1 to {warnings.%arg 1%}
@@ -68,7 +70,7 @@ command /warn <player> <text>:
 			if {warnings.%arg 1%} is greater than 3.9:
 				execute the command "/tempmute %arg 1% 30d Warning"
 				send "&8[&4*&8]&7 You now have &c5 warnings." to arg 1
-				send "&8[&4*&8]&7 Please review the rules at &b&nbit.ly/KDC-rules" to arg 1
+				send "&8[&4*&8]&7 Please review the rules at &b&n{@rules_link}" to arg 1
 				send "&8[&4*&8]&7 %arg 1% has been muted for 30 days and has 5 warnings." to command executor
 				set {warning5time.%arg 1%} to now
 				add 1 to {warnings.%arg 1%}
@@ -127,7 +129,7 @@ command /forcewarn <player> <text>:
 		if {warnings.%arg 1%} is 0:
 			execute the command "/tempmute %arg 1% 30m Warning"
 			send "&8[&4*&8]&7 You now have &c1 warning." to arg 1
-			send "&8[&4*&8]&7 Please review the rules at &b&nbit.ly/KDC-rules" to arg 1
+			send "&8[&4*&8]&7 Please review the rules at &b&n{@rules_link}" to arg 1
 			send "&8[&4*&8]&7 %arg 1% has been muted for 30 minutes and has 1 warning." to command executor
 			set {warning1time.%arg 1%} to now
 			add 1 to {warnings.%arg 1%}
@@ -137,7 +139,7 @@ command /forcewarn <player> <text>:
 		if {warnings.%arg 1%} is 1:
 			execute the command "/tempmute %arg 1% 3h Warning"
 			send "&8[&4*&8]&7 You now have &c2 warnings." to arg 1
-			send "&8[&4*&8]&7 Please review the rules at &b&nbit.ly/KDC-rules" to arg 1
+			send "&8[&4*&8]&7 Please review the rules at &b&n{@rules_link}" to arg 1
 			send "&8[&4*&8]&7 %arg 1% has been muted for 3 hours and has 2 warnings." to command executor
 			set {warning2time.%arg 1%} to now
 			add 1 to {warnings.%arg 1%}
@@ -147,7 +149,7 @@ command /forcewarn <player> <text>:
 		if {warnings.%arg 1%} is 2:
 			execute the command "/tempmute %arg 1% 1d Warning"
 			send "&8[&4*&8]&7 You now have &c3 warnings." to arg 1
-			send "&8[&4*&8]&7 Please review the rules at &b&nbit.ly/KDC-rules" to arg 1
+			send "&8[&4*&8]&7 Please review the rules at &b&n{@rules_link}" to arg 1
 			send "&8[&4*&8]&7 %arg 1% has been muted for 1 day and has 3 warnings." to command executor
 			set {warning3time.%arg 1%} to now
 			add 1 to {warnings.%arg 1%}
@@ -157,7 +159,7 @@ command /forcewarn <player> <text>:
 		if {warnings.%arg 1%} is 3:
 			execute the command "/tempmute %arg 1% 3d Warning"
 			send "&8[&4*&8]&7 You now have &c4 warnings." to arg 1
-			send "&8[&4*&8]&7 Please review the rules at &b&nbit.ly/KDC-rules" to arg 1
+			send "&8[&4*&8]&7 Please review the rules at &b&n{@rules_link}" to arg 1
 			send "&8[&4*&8]&7 %arg 1% has been muted for 3 days and has 4 warnings." to command executor
 			set {warning4time.%arg 1%} to now
 			add 1 to {warnings.%arg 1%}
@@ -168,7 +170,7 @@ command /forcewarn <player> <text>:
 		if {warnings.%arg 1%} is greater than 3.9:
 			execute the command "/tempmute %arg 1% 30d Warning"
 			send "&8[&4*&8]&7 You now have &c5 warnings." to arg 1
-			send "&8[&4*&8]&7 Please review the rules at &b&nbit.ly/KDC-rules" to arg 1
+			send "&8[&4*&8]&7 Please review the rules at &b&n{@rules_link}" to arg 1
 			send "&8[&4*&8]&7 %arg 1% has been muted for 30 days and has 5 warnings." to command executor
 			set {warning5time.%arg 1%} to now
 			add 1 to {warnings.%arg 1%}
